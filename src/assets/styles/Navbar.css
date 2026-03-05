@@ -1,0 +1,227 @@
+/* ============================================================
+   Navbar.css — Bookit navigation component
+   Sections:
+     1. General Navbar (bar, layout, entrance animation)
+     2. Logo
+     3. Buttons & Links
+     4. Search
+   ============================================================ */
+
+/* ── 1. GENERAL NAVBAR ─────────────────────────────────────── */
+
+/* Slide-in from top on page load */
+@keyframes nav-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(-100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Main bar */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 3.75rem;
+    padding-inline: 1.5rem;
+    background: rgba(253, 249, 243, 0.88);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border-bottom: 1px solid var(--color-border);
+    animation: nav-slide-in 400ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Push anything after the links to the right */
+.navbar-spacer {
+    flex: 1;
+}
+
+
+/* ── 2. LOGO ───────────────────────────────────────────────── */
+
+/* Usage: <Link className="navbar-logo">Book<span>it</span></Link> */
+.navbar-logo {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--color-text);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    margin-right: 1rem;
+    transition: opacity 200ms;
+}
+
+/* "it" gets the brand gradient */
+.navbar-logo span {
+    background: var(--gradient-brand);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.navbar-logo:hover {
+    opacity: 0.8;
+}
+
+
+/* ── 3. BUTTONS & LINKS ────────────────────────────────────── */
+
+/* Standard pill nav button
+   Usage: <button className="navbar-btn">Home</button>
+   Add  .navbar-btn--active  when route matches  */
+.navbar-btn {
+    font-family: var(--font-ui);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    padding: 0.375rem 0.8rem;
+    border-radius: var(--radius-lg);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 150ms, background 150ms, transform 150ms;
+}
+
+.navbar-btn:hover {
+    color: var(--color-text);
+    background: var(--color-cream-100);
+    transform: translateY(-1px);
+}
+
+.navbar-btn:active {
+    transform: scale(0.96);
+}
+
+/* Highlighted state — add when the route is active */
+.navbar-btn--active {
+    color: var(--color-accent);
+    background: color-mix(in oklch, var(--color-violet-500), transparent 92%);
+}
+
+/* Primary CTA button (filled gradient pill)
+   Usage: <Link className="navbar-btn navbar-btn--cta">Find Events</Link> */
+.navbar-btn--cta {
+    background: var(--gradient-brand);
+    color: white;
+    box-shadow: 0 2px 8px -2px rgb(124 58 237 / 0.35);
+}
+
+.navbar-btn--cta:hover {
+    color: white;
+    background: var(--gradient-brand);
+    box-shadow: 0 0 22px 4px rgb(139 92 246 / 0.3);
+    transform: translateY(-1px);
+}
+
+/* Icon-only square button (e.g. search icon, cart icon)
+   Usage: <button className="navbar-icon-btn">🔍</button> */
+.navbar-icon-btn {
+    width: 2.25rem;
+    height: 2.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: background 150ms, color 150ms, transform 150ms;
+}
+
+.navbar-icon-btn:hover {
+    background: var(--color-cream-100);
+    color: var(--color-text);
+    transform: scale(1.08);
+}
+
+
+/* ── 4. SEARCH ─────────────────────────────────────────────── */
+
+/* Compact inline search that expands on focus
+   Usage: <div className="navbar-search"><input … /></div> */
+.navbar-search {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1.5px solid var(--color-border);
+    border-radius: 9999px;
+    padding: 0.3rem 0.875rem;
+    width: 10rem;
+    transition: border-color 200ms, box-shadow 200ms, width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar-search:focus-within {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-violet-500), transparent 82%);
+    width: 14rem;
+}
+
+.navbar-search input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--color-text);
+    width: 100%;
+}
+
+.navbar-search input::placeholder {
+    color: var(--color-stone-400);
+}
+
+/* Optional icon inside .navbar-search */
+.navbar-search-icon {
+    color: var(--color-stone-400);
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+    width: 1rem;
+    /* Fix massively oversized SVG bug */
+    height: 1rem;
+    /* Ensure aspect ratio stays locked */
+}
+
+/* ── 5. RESPONSIVE DESIGN (MOBILE) ─────────────────────────── */
+@media (max-width: 768px) {
+    .navbar {
+        height: auto;
+        padding-block: 0.75rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .navbar-spacer {
+        display: none;
+        /* Let items naturally center on mobile */
+    }
+
+    .navbar-logo {
+        margin-right: 0;
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .navbar-search {
+        width: 100%;
+        max-width: 16rem;
+        margin-block: 0.5rem;
+    }
+
+    .navbar-search:focus-within {
+        width: 100%;
+        /* Don't expand off-screen on mobile */
+    }
+}

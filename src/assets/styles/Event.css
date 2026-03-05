@@ -1,0 +1,146 @@
+  /* ── 8. CARDS ──────────────────────────────────────────── */
+  /* Base: <div class="card [card-warm|card-glass]"><div class="card-body">…</div></div> */
+  .card {
+      background: var(--color-surface-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-2xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      transition: box-shadow 250ms var(--ease), transform 250ms var(--ease), border-color 250ms;
+  }
+
+  .card:hover {
+      box-shadow: var(--shadow-hover);
+      border-color: var(--color-cream-300);
+      transform: translateY(-2px);
+  }
+
+  /* Warm tint variant */
+  .card-warm {
+      background: linear-gradient(145deg, var(--color-cream-50), white);
+      border-color: var(--color-cream-200);
+  }
+
+  .card-warm:hover {
+      box-shadow: var(--shadow-warm);
+  }
+
+  /* Frosted glass variant — for coloured backgrounds */
+  .card-glass {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border-color: rgba(196, 181, 253, 0.3);
+  }
+
+  .card-glass:hover {
+      border-color: rgba(167, 139, 250, 0.5);
+      box-shadow: var(--shadow-glow);
+  }
+
+  .card-body {
+      padding: 1.25rem;
+  }
+
+  .card-body-lg {
+      padding: 1.75rem;
+  }
+
+  /* ── 9. TICKET ─────────────────────────────────────────── */
+  /*
+   * <div class="ticket">
+   *   <div class="ticket-accent"></div>
+   *   <div class="ticket-body">
+   *     <span class="badge badge-violet">Music</span>
+   *     <h3 class="ticket-title">Event Name</h3>
+   *     <p class="ticket-meta">📍 Venue · 🗓 Date</p>
+   *   </div>
+   *   <div class="ticket-stub">
+   *     <span class="ticket-price">$24</span>
+   *     <button class="btn btn-primary btn-sm">Book</button>
+   *   </div>
+   * </div>
+   */
+  .ticket {
+      position: relative;
+      background: var(--color-surface-card);
+      border-radius: var(--radius-2xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-warm);
+      display: flex;
+      flex-direction: column;
+      transition: all 280ms var(--ease);
+  }
+
+  .ticket:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-4px) rotate(0.3deg);
+  }
+
+  /* Dashed perforation between body and stub */
+  .ticket::after {
+      content: '';
+      position: absolute;
+      bottom: 5.375rem;
+      left: -6px;
+      right: -6px;
+      height: 1px;
+      background: repeating-linear-gradient(90deg, transparent, transparent 6px, var(--color-cream-300) 6px, var(--color-cream-300) 12px);
+      pointer-events: none;
+  }
+
+  .ticket-accent {
+      position: absolute;
+      inset-block: 0;
+      left: 0;
+      width: 5px;
+      background: var(--gradient-brand);
+  }
+
+  .ticket-body {
+      padding: 1.25rem 1.25rem 1.25rem 1.875rem;
+      flex: 1;
+  }
+
+  .ticket-stub {
+      padding: 0.875rem 1.25rem 0.875rem 1.875rem;
+      background: var(--color-cream-50);
+      border-top: 1px dashed var(--color-cream-300);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+  }
+
+  .ticket-title {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      line-height: 1.3;
+      margin-block: 0.5rem;
+  }
+
+  .ticket-meta {
+      font-family: var(--font-ui);
+      font-size: 0.825rem;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+  }
+
+  /* ticket-price for paid events, ticket-price-free for free events */
+  .ticket-price {
+      font-family: var(--font-display);
+      font-size: 1.375rem;
+      background: var(--gradient-text);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+  }
+
+  .ticket-price-free {
+      font-family: var(--font-display);
+      font-size: 1.375rem;
+      color: var(--color-accent-warm);
+  }

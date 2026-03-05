@@ -1,0 +1,77 @@
+/* ============================================================
+   Layout.css — Bookit page structure
+   Sections:
+     1. Wrap       (centred max-width container)
+     2. Sections   (vertical rhythm / page sections)
+     3. Section Header (centred label + heading + desc block)
+   ============================================================ */
+
+/* ── 1. WRAP ───────────────────────────────────────────────── */
+
+/* Centred, max-width container used on every page.
+   Usage: <div className="wrap"> … </div>            */
+.wrap {
+    width: 100%;
+    max-width: 80rem;
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .wrap {
+        padding-inline: 2.5rem;
+    }
+}
+
+@media (min-width: 1280px) {
+    .wrap {
+        padding-inline: 4rem;
+    }
+}
+
+
+/* ── 2. SECTIONS ───────────────────────────────────────────── */
+
+/* Full-height vertical padding for major page sections.
+   Usage: <section className="section"> … </section>    */
+.section {
+    padding-block: 5rem;
+}
+
+@media (min-width: 768px) {
+    .section {
+        padding-block: 7rem;
+    }
+}
+
+/* Smaller variant for tighter sections.
+   Usage: <section className="section-sm"> … </section> */
+.section-sm {
+    padding-block: 2.5rem;
+}
+
+
+/* ── 3. SECTION HEADER ─────────────────────────────────────── */
+
+/* Centred heading block that sits above grids / card rows.
+   Usage:
+     <div className="section-header">
+       <h6>Eyebrow</h6>
+       <h2>Main heading</h2>
+       <p>Short description</p>
+     </div>                                             */
+.section-header {
+    text-align: center;
+    max-width: 38rem;
+    margin-inline: auto;
+    margin-bottom: 3rem;
+}
+
+.section-header h6 {
+    color: var(--color-accent);
+    margin-bottom: 0.5rem;
+}
+
+.section-header h2 {
+    margin-bottom: 0.875rem;
+}

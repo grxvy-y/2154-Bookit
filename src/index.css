@@ -1,68 +1,538 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* ============================================================
+   BOOKIT — Design System  (Tailwind CSS v4)
+   Oatmeal warmth × Radiant SaaS polish
+   ─────────────────────────────────────────
+   TOC:  1 Fonts  2 Tailwind  3 @theme  4 Base
+         5 Layout  6 Navbar  7 Home  8 Cards
+         9 Ticket  10 Buttons  11 Badges
+         12 Forms  13 Dashboard  14 Utilities
+   ============================================================ */
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+/* 1 ── FONTS */
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* 2 ── TAILWIND */
+@import "tailwindcss";
+
+/* 3 ── @THEME ─────────────────────────────────────────────── */
+@theme {  
+  /* Raw palette */
+  --color-cream-50: #fdf9f3;
+  --color-cream-100: #f9f1e3;
+  --color-cream-200: #f2e3c8;
+  --color-cream-300: #e8ceaa;
+  --color-cream-400: #d9b38a;
+  --color-stone-400: #a8a29e;
+  --color-stone-500: #78716c;
+  --color-stone-600: #57534e;
+  --color-stone-700: #44403c;
+  --color-stone-800: #292524;
+  --color-stone-900: #1c1917;
+  --color-stone-950: #0c0a09;
+  --color-violet-100: #ede9fe;
+  --color-violet-400: #a78bfa;
+  --color-violet-500: #8b5cf6;
+  --color-violet-600: #7c3aed;
+  --color-violet-700: #6d28d9;
+  --color-fuchsia-500: #d946ef;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-700: #b45309;
+
+  /* Semantic aliases — use these everywhere */
+  --color-surface: var(--color-cream-50);
+  --color-surface-card: #ffffff;
+  --color-surface-alt: var(--color-cream-100);
+  --color-border: var(--color-cream-200);
+  --color-text: var(--color-stone-900);
+  --color-text-muted: var(--color-stone-500);
+  --color-accent: var(--color-violet-600);
+  /* primary CTA */
+  --color-accent-warm: var(--color-amber-500);
+  /* warm highlight */
+
+  /* Fonts: display = serif headers, ui = buttons/labels, body = paragraph */
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-ui: 'DM Sans', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  /* Radii */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+
+  /* Shadows */
+  --shadow-card: 0 2px 8px -2px rgb(28 25 23/.08), 0 1px 2px -1px rgb(28 25 23/.06);
+  --shadow-hover: 0 8px 24px -4px rgb(28 25 23/.14);
+  --shadow-warm: 0 4px 16px -4px rgb(120 81 50/.16);
+  --shadow-glow: 0 0 28px 4px rgb(139 92 246/.28);
+
+  /* Gradients */
+  --gradient-brand: linear-gradient(135deg, var(--color-violet-600), var(--color-fuchsia-500));
+  --gradient-text: linear-gradient(135deg, var(--color-violet-600), var(--color-fuchsia-500) 55%, var(--color-amber-400));
+  --gradient-page: linear-gradient(160deg, var(--color-cream-50) 0%, #fffbeb 60%, var(--color-violet-100) 100%);
+  --gradient-dark: linear-gradient(135deg, var(--color-stone-900), #32155e);
+
+  /* Easing */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+/* 4 ── BASE ──────────────────────────────────────────────── */
+@layer base {
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-body);
+    color: var(--color-text);
+    background: var(--color-surface) var(--gradient-page) fixed;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  /* Headings → editorial serif */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    color: var(--color-text);
+  }
+
+  h1 {
+    font-size: clamp(2.25rem, 6vw, 3.75rem);
+  }
+
+  h2 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+  }
+
+  h3 {
+    font-size: 1.5rem;
+  }
+
+  /* h6 → sans for UI labels / eyebrows */
+  h6 {
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  p {
+    line-height: 1.65;
+    color: var(--color-text-muted);
+  }
+
+  a {
+    color: var(--color-accent);
+    text-decoration: none;
+    transition: opacity 150ms;
+  }
+
   a:hover {
-    color: #747bff;
+    opacity: 0.75;
   }
-  button {
-    background-color: #f9f9f9;
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
+
+  ::selection {
+    background: color-mix(in oklch, var(--color-violet-500), transparent 75%);
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-cream-100);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-cream-400);
+    border-radius: 9999px;
+  }
+}
+
+/* 5–14 ── COMPONENTS ─────────────────────────────────────── */
+@layer components {
+
+
+
+
+
+
+  /* ── 10. BUTTONS ───────────────────────────────────────── */
+  /* <button class="btn btn-primary [btn-sm|btn-lg]">Label</button> */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    font-family: var(--font-ui);
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    user-select: none;
+    transition: all 180ms var(--ease);
+  }
+
+  .btn:active {
+    transform: scale(0.97);
+  }
+
+  .btn-primary {
+    background: var(--gradient-brand);
+    color: white;
+    box-shadow: 0 2px 8px -2px rgb(124 58 237/.4);
+  }
+
+  .btn-primary:hover {
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    background: var(--color-cream-100);
+    color: var(--color-stone-800);
+    border-color: var(--color-cream-300);
+  }
+
+  .btn-secondary:hover {
+    background: var(--color-cream-200);
+    transform: translateY(-1px);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--color-text);
+    border-color: var(--color-border);
+  }
+
+  .btn-ghost:hover {
+    background: var(--color-cream-100);
+    border-color: var(--color-cream-300);
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: white;
+  }
+
+  .btn-danger:hover {
+    box-shadow: 0 0 18px 3px rgb(220 38 38/.25);
+    transform: translateY(-1px);
+  }
+
+  .btn-sm {
+    padding: 0.45rem 0.9rem;
+    font-size: 0.8rem;
+  }
+
+  .btn-lg {
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
+  }
+
+  /* ── 11. BADGES ────────────────────────────────────────── */
+  /* <span class="badge badge-violet">Music</span>
+     Add <span class="badge-dot"></span> inside for a status dot */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+    font-family: var(--font-ui);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    border: 1px solid transparent;
+  }
+
+  .badge-violet {
+    background: color-mix(in oklch, var(--color-violet-500), transparent 88%);
+    color: var(--color-violet-700);
+    border-color: color-mix(in oklch, var(--color-violet-400), transparent 68%);
+  }
+
+  .badge-amber {
+    background: color-mix(in oklch, var(--color-amber-500), transparent 88%);
+    color: var(--color-amber-700);
+    border-color: color-mix(in oklch, var(--color-amber-400), transparent 68%);
+  }
+
+  .badge-green {
+    background: color-mix(in oklch, #22c55e, transparent 88%);
+    color: #15803d;
+    border-color: color-mix(in oklch, #22c55e, transparent 72%);
+  }
+
+  .badge-red {
+    background: color-mix(in oklch, #ef4444, transparent 88%);
+    color: #b91c1c;
+    border-color: color-mix(in oklch, #ef4444, transparent 72%);
+  }
+
+  .badge-stone {
+    background: var(--color-cream-100);
+    color: var(--color-stone-600);
+    border-color: var(--color-cream-300);
+  }
+
+  .badge-dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 9999px;
+    background: currentColor;
+  }
+
+  /* ── 12. FORMS ─────────────────────────────────────────── */
+  /* <div class="form-group">
+       <label class="label" for="x">Name</label>
+       <input  class="input [input-search|textarea|select]" id="x" />
+       <p class="form-hint">Helper text</p>
+       <p class="form-error">Error message</p>
+     </div> */
+  .label {
+    display: block;
+    font-family: var(--font-ui);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 0.375rem;
+  }
+
+  .input {
+    width: 100%;
+    padding: 0.6rem 0.875rem;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--color-text);
+    background: white;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    outline: none;
+    appearance: none;
+    transition: border-color 150ms, box-shadow 150ms;
+  }
+
+  .input::placeholder {
+    color: var(--color-stone-400);
+  }
+
+  .input:hover {
+    border-color: var(--color-cream-400);
+  }
+
+  .input:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-violet-500), transparent 82%);
+  }
+
+  .input-search {
+    padding-left: 2.625rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2378716c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 0.75rem center;
+  }
+
+  .select {
+    cursor: pointer;
+    padding-right: 2.25rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2378716c' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+  }
+
+  .textarea {
+    min-height: 6rem;
+    resize: vertical;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .form-hint {
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    color: var(--color-stone-400);
+  }
+
+  .form-error {
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    color: #dc2626;
+    font-weight: 500;
+  }
+
+
+
+  /* ── 14. UTILITIES ─────────────────────────────────────── */
+
+  /* Gradient text — wrap any text node in a <span class="text-gradient"> */
+  .text-gradient {
+    background: var(--gradient-text);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Ticket capacity bar
+     <div class="progress"><div class="progress-bar" style="width:72%"></div></div> */
+  .progress {
+    height: 5px;
+    background: var(--color-cream-200);
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    border-radius: 9999px;
+    background: var(--gradient-brand);
+    transition: width 500ms var(--ease);
+  }
+
+  /* Simple gradient divider */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-cream-300), transparent);
+    border: none;
+  }
+
+  /* Animation helpers — add to any element */
+  .anim-fade-in {
+    animation: fade-in 450ms var(--ease) both;
+  }
+
+  .anim-fade-up {
+    animation: fade-up 450ms var(--ease) both;
+  }
+
+  .anim-scale-in {
+    animation: scale-in 350ms var(--ease-spring) both;
+  }
+
+  .anim-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .anim-pulse-glow {
+    animation: pulse-glow 2.5s ease-in-out infinite;
+  }
+
+  /* Stagger delays for lists of cards — add delay-1 … delay-5 */
+  .delay-1 {
+    animation-delay: 80ms;
+  }
+
+  .delay-2 {
+    animation-delay: 160ms;
+  }
+
+  .delay-3 {
+    animation-delay: 240ms;
+  }
+
+  .delay-4 {
+    animation-delay: 320ms;
+  }
+
+  .delay-5 {
+    animation-delay: 400ms;
+  }
+}
+
+/* KEYFRAMES ─────────────────────────────────────────────── */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: var(--shadow-glow);
+    opacity: .7;
+  }
+
+  50% {
+    box-shadow: 0 0 40px 8px rgb(139 92 246/.4);
+    opacity: 1;
   }
 }
