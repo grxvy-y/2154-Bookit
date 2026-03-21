@@ -1,3 +1,4 @@
+// Register — new account form with role selection (attendee or organizer)
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -18,6 +19,7 @@ const Register = () => {
         e.preventDefault()
         setError('')
 
+        // Password must be at least 6 characters (also enforced by Supabase server-side)
         if (password.length < 6) {
             setError('Password must be at least 6 characters.')
             return

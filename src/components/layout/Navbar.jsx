@@ -1,3 +1,4 @@
+// Navbar — top navigation bar with conditional links, cart badge, and auth controls
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
@@ -11,7 +12,7 @@ const Navbar = () => {
 
     const handleSignOut = async () => {
         await signOut()
-        navigate('/')
+        navigate('/') // Redirect home so protected pages aren't shown after logout
     }
 
     return (
@@ -31,22 +32,24 @@ const Navbar = () => {
                 Browse Events
             </NavLink>
 
+            {/* Only shown to organizers */}
             {profile?.role === 'organizer' && (
                 <NavLink to="/Organizer" className={({ isActive }) => `navbar-btn${isActive ? ' navbar-btn--active' : ''}`}>
                     Organizer
                 </NavLink>
             )}
 
+            {/* Cart with live item count badge — only shown when logged in */}
             {user && (
                 <NavLink to="/Cart" className={({ isActive }) => `navbar-btn${isActive ? ' navbar-btn--active' : ''}`}>
                     Cart{cartCount > 0 && <span className="navbar-cart-badge">{cartCount}</span>}
                 </NavLink>
             )}
 
-            {/* Push CTA to the right */}
+            {/* Push right-side elements to the right */}
             <div className="navbar-spacer" />
 
-                        {/* Search Bar - Moved next to CTA for better flow */}
+            {/* Search bar */}
             <div className="hidden md:block mr-2">
                 <Search />
             </div>
@@ -56,6 +59,7 @@ const Navbar = () => {
                 <div className="navbar-user">
                     <span className="navbar-username" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                         {profile?.full_name || user.email}
+                        {/* HOST badge for organizer accounts */}
                         {profile?.role === 'organizer' && (
                             <span title="Organizer" style={{ background: '#f59e0b', color: '#fff', fontSize: '0.65rem', padding: '0.15rem 0.3rem', borderRadius: '4px', fontWeight: 'bold', lineHeight: 1 }}>
                                 HOST

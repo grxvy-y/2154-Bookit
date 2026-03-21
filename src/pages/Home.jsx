@@ -99,7 +99,7 @@ const Home = () => {
                                         <img src={evt.image} alt={evt.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                         {/* Overlay register button on hover */}
                                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                                            <button className="btn btn-primary">Register Now</button>
+                                            <Link to="/Browse" className="btn btn-primary">Register Now</Link>
                                         </div>
                                     </div>
                                     <div className="card-body flex flex-col justify-start grow">
@@ -118,7 +118,7 @@ const Home = () => {
                     <div className="promo-grid">
 
                         {/* Box 1: Sign up as User */}
-                        <div className="promo-box promo-box-light relative overflow-hidden group cursor-pointer">
+                        <Link to="/register" className="promo-box promo-box-light relative overflow-hidden group text-inherit no-underline block">
                             <div className="absolute inset-0 z-0">
                                 <img src="https://images.unsplash.com/photo-1593311902504-4031410a99c6?ixid=M3wxMjA3fDB8MXxzZWFyY2h8Mnx8dG9yb250byUyMGNvbW11bml0eXxlbnwwfHx8fDE3NzQwNTc4MjZ8MA&ixlib=rb-4.1.0&w=800&q=80" alt="Join" className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity" />
                             </div>
@@ -127,9 +127,9 @@ const Home = () => {
                                     <h3 className="text-xl font-bold mb-2">Join the Community</h3>
                                     <p className="text-sm">Sign up as a member to easily track your tickets and favorite events.</p>
                                 </div>
-                                <button className="btn btn-secondary self-start mt-4">Sign Up</button>
+                                <div className="mt-4 font-bold text-black" style={{ display: 'inline-block', background: 'white', padding: '0.6rem 1.25rem', borderRadius: '999px', fontSize: '0.875rem' }}>Sign Up</div>
                             </div>
-                        </div>
+                        </Link>
 
                         {/* Box 2: Browse More Events */}
                         <Link to="/Browse" className="promo-box promo-box-warm relative overflow-hidden group text-inherit no-underline block">

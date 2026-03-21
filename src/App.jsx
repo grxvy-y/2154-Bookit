@@ -1,3 +1,4 @@
+// App — root component, provider setup, and route definitions
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { CartProvider } from './context/CartContext'
@@ -18,13 +19,14 @@ const App = () => {
             <Router>
                 <Routes>
                     <Route element={<Layout />}>
+
                         {/* Public routes */}
                         <Route path="/" element={<Home />} />
                         <Route path="/Browse" element={<Browse />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
 
-                        {/* Protected routes */}
+                        {/* Protected routes — require login */}
                         <Route path="/Cart" element={
                             <ProtectedRoute>
                                 <Cart />
@@ -35,11 +37,13 @@ const App = () => {
                                 <Checkout />
                             </ProtectedRoute>
                         } />
+                        {/* Organizer dashboard — requires role='organizer' */}
                         <Route path="/Organizer" element={
                             <ProtectedRoute requiredRole="organizer">
                                 <Organizer />
                             </ProtectedRoute>
                         } />
+
                     </Route>
                 </Routes>
             </Router>

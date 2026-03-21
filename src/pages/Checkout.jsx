@@ -1,3 +1,5 @@
+// Checkout — 3-step flow: Review → Payment (simulated) → Confirmation
+// Writes one orders row + one tickets row per ticket to Supabase on completion.
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
@@ -5,7 +7,7 @@ import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import '../assets/styles/Checkout.css'
 
-// ── Step indicator ───────────────────────────────────────────
+// Step labels
 const STEPS = ['Review Order', 'Payment', 'Confirmation']
 
 const StepBar = ({ current }) => (
@@ -25,7 +27,7 @@ const StepBar = ({ current }) => (
     </div>
 )
 
-// ── Step 1: Review ───────────────────────────────────────────
+// Step 1: shows cart items + total
 const ReviewStep = ({ cartItems, cartTotal, onNext }) => (
     <div className="checkout-card">
         <h2>Review your order</h2>
@@ -65,6 +67,8 @@ const PaymentStep = ({ cartTotal, onPay, loading }) => {
         return digits.length >= 3 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits
     }
 
+    // Validates the card form fields before calling onPay().
+    // Returns an errors object; empty object means the form is valid.
     const validate = () => {
         const e = {}
         if (!form.name.trim()) e.name = 'Name is required'
@@ -205,6 +209,7 @@ const Checkout = () => {
 
         for (const group of Object.values(groups)) {
             // Skip DB write for placeholder mock events (no real UUID)
+            // Mock events can be used for UI testing without needing real Supabase data
             if (group.eventId.startsWith('mock-')) {
                 refs.push({ id: `MOCK-${Date.now()}`, eventTitle: group.eventTitle })
                 continue
@@ -227,7 +232,9 @@ const Checkout = () => {
                 continue
             }
 
-            // Create one ticket row per individual ticket
+            // Create one ticket row per individual ticket.
+            // Each ticket gets a unique QR code generated client-side via the Web Crypto API.
+            // In a production app this should be generated server-side for security.
             const ticketRows = []
             for (const item of group.items) {
                 for (let i = 0; i < item.quantity; i++) {

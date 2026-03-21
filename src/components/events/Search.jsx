@@ -1,3 +1,5 @@
+// Search — navbar search bar; navigates to /Browse?search=<query> on submit
+// TODO: wire up to a Supabase .ilike() query when backend search is needed
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../../assets/styles/Navbar.css'
@@ -25,8 +27,7 @@ const Search = () => {
             // Simulated delay for now
             await new Promise(resolve => setTimeout(resolve, 500))
 
-            // For now, simply navigate to the browse page with the query as a URL parameter
-            // so the Browse page can handle the actual fetching/filtering
+            // Navigate to Browse with the query as a URL param
             navigate(`/Browse?search=${encodeURIComponent(searchQuery)}`)
 
         } catch (error) {

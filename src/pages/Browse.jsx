@@ -1,3 +1,4 @@
+// Browse — lists all published events with a client-side search filter
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import EventCard from '../components/events/EventCard'
@@ -10,12 +11,13 @@ const Browse = () => {
 
     useEffect(() => {
         const fetchEvents = async () => {
+            // Fetch published events soonest-first, including ticket_types for pricing
             const { data, error } = await supabase
                 .from('events')
                 .select('*, ticket_types(*)')
                 .eq('status', 'published')
                 .order('date', { ascending: true })
-            
+
             if (error) {
                 console.error('Error fetching events:', error)
             } else {
@@ -27,6 +29,7 @@ const Browse = () => {
         fetchEvents()
     }, [])
 
+    // Filter events by title or location (case-insensitive)
     const filtered = events.filter(e =>
         e.title?.toLowerCase().includes(search.toLowerCase()) ||
         e.location?.toLowerCase().includes(search.toLowerCase())

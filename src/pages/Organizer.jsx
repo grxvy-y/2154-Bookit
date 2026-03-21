@@ -1,3 +1,5 @@
+// Organizer — dashboard for event organizers (create, edit, publish, delete events)
+// Only accessible to users with profile.role = 'organizer' (see ProtectedRoute in App.jsx)
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
@@ -5,15 +7,18 @@ import '../assets/styles/Dashboard.css';
 
 const Organizer = () => {
     const { user } = useAuth();
-    const [events, setEvents] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [showForm, setShowForm] = useState(false);
+
+    // ── State ──────────────────────────────────────────────────────────────────
+    const [events, setEvents]           = useState([]);   // All events for this organizer
+    const [loading, setLoading]         = useState(true);
+    const [showForm, setShowForm]       = useState(false); // Toggles the create/edit form
+    // null = create mode, event object = edit mode
     const [editingEvent, setEditingEvent] = useState(null);
 
-    // Dynamic stats pulled from DB
+    // KPI stats: revenue and tickets sold are fetched live; views is a static placeholder
     const [stats, setStats] = useState({ revenue: 0, sold: 0, views: '1.2k' });
 
-    // Form state
+    // Form fields for the create/edit event form
     const [formData, setFormData] = useState({
         title: '',
         date: '',
@@ -21,18 +26,21 @@ const Organizer = () => {
         location: '',
         description: '',
         capacity: 0,
-        eventType: 'free',
-        price: '',
-        endDate: '',
-        recurringDays: []
+        eventType: 'free',  // 'free' | 'paid' | 'recurring'
+        price: '',           // paid or recurring events only
+        endDate: '',         // recurring events only
+        recurringDays: [],   // recurring events only, e.g. ['Monday', 'Wednesday']
+        rsvpCode: ''         // free events only
     });
 
+    // Fetch events whenever the logged-in user changes (or on initial mount)
     useEffect(() => {
         if (user) {
             fetchEvents();
         }
     }, [user]);
 
+    // Fetches all events for this organizer and calculates KPI stats
     const fetchEvents = async () => {
         setLoading(true);
         const { data: eventsData, error: eventsError } = await supabase
@@ -43,32 +51,32 @@ const Organizer = () => {
 
         if (!eventsError && eventsData) {
             setEvents(eventsData);
-            
-            // Calculate dynamic KPI stats
+
+            // Calculate KPI stats
             let totalRevenue = 0;
             let ticketsSold = 0;
-            
+
             const eventIds = eventsData.map(e => e.id);
             if (eventIds.length > 0) {
-                // Fetch confirmed orders logic from DB
+                // Sum revenue from confirmed orders
                 const { data: ordersData } = await supabase
                     .from('orders')
                     .select('total_amount')
                     .in('event_id', eventIds)
                     .eq('status', 'confirmed');
-                
+
                 if (ordersData) {
                     totalRevenue = ordersData.reduce((sum, order) => sum + Number(order.total_amount), 0);
                 }
 
-                // Fetch physical ticket count securely created
+                // Count physical ticket rows
                 const ticketTypeIds = eventsData.flatMap(e => e.ticket_types?.map(t => t.id) || []);
                 if (ticketTypeIds.length > 0) {
                     const { count: ticketsCount, error } = await supabase
                         .from('tickets')
                         .select('id', { count: 'exact', head: true })
                         .in('ticket_type_id', ticketTypeIds);
-                    
+
                     if (ticketsCount !== null) {
                         ticketsSold = ticketsCount;
                     }
@@ -78,7 +86,7 @@ const Organizer = () => {
             setStats({
                 revenue: totalRevenue,
                 sold: ticketsSold,
-                views: '1.2k' // Static placeholder as views table doesn't exist
+                views: '1.2k' // Static placeholder as views table doesn't exist yet
             });
         } else if (eventsError) {
             console.error('Error fetching events:', eventsError);
@@ -86,20 +94,34 @@ const Organizer = () => {
         setLoading(false);
     };
 
+    // ── handleInputChange ──────────────────────────────────────────────────────
+    // Generic handler for all text/select/number inputs in the form.
+    // Checkbox inputs for recurringDays are handled separately with their own onChange.
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    // ── resetForm ─────────────────────────────────────────────────────────────
+    // Clears all form fields, exits edit mode, and hides the form panel.
     const resetForm = () => {
-        setFormData({ title: '', date: '', time: '', location: '', description: '', capacity: 0, eventType: 'free', price: '', endDate: '', recurringDays: [] });
+        setFormData({ title: '', date: '', time: '', location: '', description: '', capacity: 0, eventType: 'free', price: '', endDate: '', recurringDays: [], rsvpCode: '' });
         setEditingEvent(null);
         setShowForm(false);
     };
 
+    // ── handleCreateOrUpdate ───────────────────────────────────────────────────
+    // Handles both creating a new event and saving edits to an existing one.
+    // After writing the event row it also creates/updates the associated ticket_type.
+    //
+    // Event type → ticket type mapping:
+    //   'free'      → price=0,     name='RSVP'
+    //   'paid'      → price=input, name='General Admission'
+    //   'recurring' → price=0,     name='Recurring Event'
     const handleCreateOrUpdate = async (e) => {
         e.preventDefault();
-        
+
+        // Build the event row payload (recurring-only fields are null for other types)
         const eventPayload = {
             title: formData.title,
             date: formData.date,
@@ -109,14 +131,16 @@ const Organizer = () => {
             capacity: formData.capacity,
             organizer_id: user.id,
             end_date: formData.eventType === 'recurring' && formData.endDate ? formData.endDate : null,
-            recurring_days: formData.eventType === 'recurring' && formData.recurringDays.length > 0 ? formData.recurringDays.join(', ') : null
+            recurring_days: formData.eventType === 'recurring' && formData.recurringDays.length > 0 ? formData.recurringDays.join(', ') : null,
+            rsvp_code: formData.eventType === 'free' && formData.rsvpCode.trim() !== '' ? formData.rsvpCode.trim() : null
         };
 
-        const price = formData.eventType === 'paid' ? Number(formData.price) : 0;
-        const ticketTypeName = formData.eventType === 'paid' ? 'General Admission' : 
+        const price = (formData.eventType === 'paid' || formData.eventType === 'recurring') ? Number(formData.price) : 0;
+        const ticketTypeName = formData.eventType === 'paid' ? 'General Admission' :
                                formData.eventType === 'recurring' ? 'Recurring Event' : 'RSVP';
 
         if (editingEvent) {
+            // ── UPDATE existing event ────────────────────────────────────────
             const { error } = await supabase
                 .from('events')
                 .update(eventPayload)
@@ -126,15 +150,17 @@ const Organizer = () => {
                 console.error('Error updating event:', error);
                 alert('Failed to update event.');
             } else {
-                // Upsert ticket type payload
+                // Update or create the ticket_type row for this event
                 const existingTicketType = editingEvent.ticket_types?.[0];
                 if (existingTicketType) {
+                    // Update existing ticket type (preserves the id / existing ticket rows)
                     await supabase.from('ticket_types').update({
-                        price: price, 
-                        quantity: formData.capacity, 
+                        price: price,
+                        quantity: formData.capacity,
                         name: ticketTypeName
                     }).eq('id', existingTicketType.id);
                 } else {
+                    // No ticket type exists yet — insert one
                     await supabase.from('ticket_types').insert([{
                         event_id: editingEvent.id,
                         price: price,
@@ -147,7 +173,7 @@ const Organizer = () => {
                 resetForm();
             }
         } else {
-            // handle event creation
+            // ── CREATE new event ─────────────────────────────────────────────
             const { data: newEvent, error } = await supabase
                 .from('events')
                 .insert([eventPayload])
@@ -158,7 +184,7 @@ const Organizer = () => {
                 console.error('Error creating event:', error);
                 alert('Failed to create event.');
             } else if (newEvent) {
-                // Instantly generate corresponding ticket tracking db records automatically
+                // Every event needs at least one ticket_type for pricing/cart to work
                 await supabase.from('ticket_types').insert([{
                     event_id: newEvent.id,
                     price: price,
@@ -172,27 +198,35 @@ const Organizer = () => {
         }
     };
 
+    // ── handleEdit ─────────────────────────────────────────────────────────────
+    // Pre-populates the form with an existing event's data so the user can edit it.
+    // Reads the first ticket_type to determine whether the event was paid or recurring.
     const handleEdit = (event) => {
         const primaryTicket = event.ticket_types?.[0];
-        const isPaid = primaryTicket && Number(primaryTicket.price) > 0;
         const isRecurring = primaryTicket && primaryTicket.name === 'Recurring Event';
+        const isPaid      = primaryTicket && Number(primaryTicket.price) > 0 && !isRecurring;
 
         setFormData({
-            title: event.title,
-            date: event.date,
-            time: event.time,
-            location: event.location,
-            description: event.description || '',
-            capacity: event.capacity || 0,
-            eventType: isPaid ? 'paid' : isRecurring ? 'recurring' : 'free',
-            price: isPaid ? primaryTicket.price : '',
-            endDate: event.end_date || '',
-            recurringDays: event.recurring_days ? event.recurring_days.split(', ') : []
+            title:         event.title,
+            date:          event.date,
+            time:          event.time,
+            location:      event.location,
+            description:   event.description || '',
+            capacity:      event.capacity || 0,
+            eventType:     isPaid ? 'paid' : isRecurring ? 'recurring' : 'free',
+            price:         (isPaid || isRecurring) && primaryTicket.price > 0 ? primaryTicket.price : '',
+            endDate:       event.end_date || '',
+            // Convert the stored comma-separated string back to an array for the checkboxes
+            recurringDays: event.recurring_days ? event.recurring_days.split(', ') : [],
+            rsvpCode:      event.rsvp_code || ''
         });
         setEditingEvent(event);
         setShowForm(true);
     };
 
+    // ── handleDelete ───────────────────────────────────────────────────────────
+    // Deletes the event row. Ticket types and ticket rows cascade automatically
+    // because of ON DELETE CASCADE foreign keys defined in schema.sql.
     const handleDelete = async (eventId) => {
         if (!window.confirm('Are you sure you want to delete this event? This will also archive related tickets.')) return;
 
@@ -200,19 +234,20 @@ const Organizer = () => {
             .from('events')
             .delete()
             .eq('id', eventId);
-        
+
         if (error) {
             console.error('Error deleting event:', error);
             alert('Failed to delete event.');
         } else {
-            // Because our event/ticket_type relationship is cascading in schema.sql, 
-            // tickets automatically dissolve seamlessly.
+            // Optimistically remove from local state, then re-fetch to update stats
             setEvents(events.filter(e => e.id !== eventId));
-            // Trigger stats re-calc efficiently
             fetchEvents();
         }
     };
 
+    // ── handlePublish ──────────────────────────────────────────────────────────
+    // Flips an event's status from 'draft' to 'published'.
+    // Published events become visible to the public on the Browse page.
     const handlePublish = async (eventId) => {
         const { error } = await supabase
             .from('events')
@@ -227,6 +262,8 @@ const Organizer = () => {
         }
     };
 
+    // ── getStatusStyle ─────────────────────────────────────────────────────────
+    // Returns inline style for the status column so published vs draft are visually distinct.
     const getStatusStyle = (status) => {
         if (status === 'published') {
             return { color: 'green', fontWeight: 'bold' };
@@ -346,10 +383,16 @@ const Organizer = () => {
                                     <label style={{ display: 'block', marginBottom: '0.25rem' }}>Capacity (per event)</label>
                                     <input required type="number" min="1" name="capacity" value={formData.capacity} onChange={handleInputChange} className="input" style={{ width: '100%' }} />
                                 </div>
-                                {formData.eventType === 'paid' && (
+                                {(formData.eventType === 'paid' || formData.eventType === 'recurring') && (
                                     <div>
                                         <label style={{ display: 'block', marginBottom: '0.25rem' }}>Ticket Price ($)</label>
                                         <input required type="number" min="0" step="0.01" name="price" value={formData.price} onChange={handleInputChange} placeholder="e.g. 15.00" className="input" style={{ width: '100%' }} />
+                                    </div>
+                                )}
+                                {formData.eventType === 'free' && (
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '0.25rem' }}>RSVP Access Code (Optional)</label>
+                                        <input type="text" name="rsvpCode" value={formData.rsvpCode} onChange={handleInputChange} placeholder="e.g. WEDDING2026" className="input" style={{ width: '100%' }} />
                                     </div>
                                 )}
                             </div>
@@ -383,7 +426,15 @@ const Organizer = () => {
                                 {events.map((event) => {
                                     const tType = event.ticket_types?.[0];
                                     const isRecu = tType && tType.name === 'Recurring Event';
-                                    const priceInfo = isRecu ? 'Recurring (Free)' : tType && Number(tType.price) > 0 ? `$${Number(tType.price).toFixed(2)}` : 'RSVP (Free)';
+                                    
+                                    let priceInfo = 'RSVP (Free)';
+                                    if (isRecu) {
+                                        priceInfo = tType && Number(tType.price) > 0 ? `Recurring ($${Number(tType.price).toFixed(2)})` : 'Recurring (Free)';
+                                    } else if (tType && Number(tType.price) > 0) {
+                                        priceInfo = `$${Number(tType.price).toFixed(2)}`;
+                                    } else if (event.rsvp_code) {
+                                        priceInfo = `RSVP (Code: ${event.rsvp_code})`;
+                                    }
 
                                     return (
                                         <tr key={event.id}>

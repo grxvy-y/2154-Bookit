@@ -1,9 +1,26 @@
+/**
+ * getEventCategoryAndImage
+ *
+ * Inspects an event's title and description to automatically assign:
+ *   - a category label (e.g. 'Tech & Innovation', 'Music')
+ *   - a matching Toronto-themed fallback image from Unsplash
+ *
+ * This runs client-side so no extra DB column is needed — categories
+ * are derived purely from keyword matching at render time.
+ *
+ * @param {string} title       - The event title
+ * @param {string} description - The event description (optional)
+ * @returns {{ category: string, defaultImage: string }}
+ */
 export const getEventCategoryAndImage = (title, description) => {
+    // Merge title + description into one lowercase string for easy keyword matching
     const combinedText = (title + " " + (description || "")).toLowerCase();
-    
+
+    // Default fallback: generic Toronto city photo + 'Community' category
     let defaultImage = "https://images.unsplash.com/photo-1632533794618-808be7570b1f?ixid=M3wxMjA3fDB8MXxzZWFyY2h8Mnx8dG9yb250byUyMGNpdHl8ZW58MHx8fHwxNzc0MDU3ODIzfDA&ixlib=rb-4.1.0&w=800&q=80";
     let category = 'Community';
 
+    // Each branch checks for keywords and swaps in the appropriate category + image
     if (combinedText.match(/tech|hackathon|startup|code|software|app|AI|developer/i)) {
         category = 'Tech & Innovation';
         defaultImage = "https://images.unsplash.com/photo-1643500326854-c82fcae849b7?ixid=M3wxMjA3fDB8MXxzZWFyY2h8Mnx8dG9yb250byUyMHRlY2h8ZW58MHx8fHwxNzc0MDU3ODI0fDA&ixlib=rb-4.1.0&w=800&q=80";
@@ -27,7 +44,7 @@ export const getEventCategoryAndImage = (title, description) => {
         defaultImage = "https://images.unsplash.com/photo-1567105800714-0106cfd63b55?ixid=M3wxMjA3fDB8MXxzZWFyY2h8MXx8dG9yb250byUyMGNvbmNlcnR8ZW58MHx8fHwxNzc0MDU3ODI1fDA&ixlib=rb-4.1.0&w=800&q=80";
     } else if (combinedText.match(/community|volunteer|meetup|social|gathering|party/i)) {
         category = 'Community';
-        defaultImage = "https://images.unsplash.com/photo-1505696484778-f3ef5189cf07?ixid=M3wxMjA3fDB8MXxzZWFyY2h8Mnx8dG9yb250byUyMHBlb3BsZXxlbnwwfHx8fDE3NzQwNTc4MjV8MA&ixlib=rb-4.1.0&w=800&q=80"; 
+        defaultImage = "https://images.unsplash.com/photo-1505696484778-f3ef5189cf07?ixid=M3wxMjA3fDB8MXxzZWFyY2h8Mnx8dG9yb250byUyMHBlb3BsZXxlbnwwfHx8fDE3NzQwNTc4MjV8MA&ixlib=rb-4.1.0&w=800&q=80";
     }
 
     return { category, defaultImage };

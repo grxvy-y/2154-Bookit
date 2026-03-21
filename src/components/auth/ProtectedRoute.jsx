@@ -1,11 +1,15 @@
+// ProtectedRoute — guards a route by login status and optional role.
+// Props: children (page to render), requiredRole (e.g. 'organizer', optional)
 import { Navigate, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
 const ProtectedRoute = ({ children, requiredRole }) => {
     const { user, profile, loading } = useAuth()
 
+    // Wait for session to resolve before making any access decision
     if (loading) return null
 
+    // Not logged in — show access denied
     if (!user) return (
         <div style={{ padding: '5rem 2rem', textAlign: 'center', background: '#ffebee', color: '#c62828', minHeight: '60vh' }}>
             <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Access Denied: Not Logged In</h2>
@@ -16,6 +20,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
         </div>
     )
 
+    // Logged in but wrong role — show permission error
     if (requiredRole && profile?.role !== requiredRole) {
         return (
             <div style={{ padding: '5rem 2rem', textAlign: 'center', background: '#ffebee', color: '#c62828', minHeight: '60vh' }}>

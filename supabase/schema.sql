@@ -50,8 +50,13 @@ create table public.events (
   status       text not null default 'draft'
                  check (status in ('draft', 'published')),
   created_at   timestamptz not null default now(),
+  -- [NEW] Last date a recurring event runs (used alongside recurring_days)
   end_date     date,
-  recurring_days text
+  -- [NEW] Comma-separated days of the week the event repeats (e.g. 'Mon, Wed, Fri')
+  --       When set, the event is treated as a free Recurring Community Event (announcement)
+  recurring_days text,
+  -- [NEW] Optional secret code attendees must enter to RSVP for free events
+  rsvp_code      text
 );
 
 
