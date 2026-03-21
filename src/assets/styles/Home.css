@@ -27,7 +27,7 @@
       top: -8rem;
       left: 50%;
       transform: translateX(-50%);
-      background: radial-gradient(circle, color-mix(in oklch, var(--color-violet-400), transparent 75%) 0%, transparent 70%);
+      background: radial-gradient(circle, color-mix(in oklch, var(--color-amber-600, #d97706), transparent 75%) 0%, transparent 70%);
       animation: float 8s ease-in-out infinite;
   }
 
@@ -37,6 +37,7 @@
       max-width: 18ch;
       margin-inline: auto;
       margin-bottom: 1rem;
+      font-weight: 500;
   }
 
   .hero p {
@@ -45,6 +46,7 @@
       margin-inline: auto;
       margin-bottom: 2rem;
       font-size: 1.1rem;
+      color: var(--color-cream-100);
   }
 
   .hero-actions {
@@ -63,15 +65,15 @@
       /* Fix for flex container parent */
       gap: 0.5rem;
       padding: 0.3rem 0.9rem;
-      background: color-mix(in oklch, var(--color-violet-500), transparent 90%);
-      border: 1px solid color-mix(in oklch, var(--color-violet-400), transparent 68%);
+      background: color-mix(in oklch, var(--color-amber-500), transparent 85%);
+      border: 1px solid color-mix(in oklch, var(--color-amber-500), transparent 68%);
       border-radius: 9999px;
       font-family: var(--font-ui);
       font-size: 0.7rem;
       font-weight: 600;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--color-violet-700);
+      color: var(--color-amber-400);
       margin-bottom: 1.25rem;
   }
 
@@ -96,14 +98,14 @@
   }
 
   .promo-box-light {
-      background: white;
+      background: var(--color-surface-card);
       border: 1px solid var(--color-border);
       box-shadow: var(--shadow-card);
   }
 
   .promo-box-warm {
       background: var(--gradient-page);
-      border: 1px solid var(--color-cream-200);
+      border: 1px solid var(--color-border);
   }
 
   .promo-box-dark {

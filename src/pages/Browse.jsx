@@ -1,67 +1,35 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
 import EventCard from '../components/events/EventCard'
 import '../assets/styles/Event.css'
 
-// Placeholder events until organizers create real ones via the dashboard
-const MOCK_EVENTS = [
-    {
-        id: 'mock-1',
-        name: 'Networking Event',
-        date: '2026-04-05',
-        time: '12:00 PM',
-        location: 'Downtown Conference Centre',
-        description: 'Connect and network with professionals in the Developer field.',
-        image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=500&q=80',
-        ticket_types: [
-            { id: 'mock-1-general', name: 'General Admission', price: 15.00 },
-            { id: 'mock-1-vip', name: 'VIP', price: 45.00 },
-        ]
-    },
-    {
-        id: 'mock-2',
-        name: 'Birthday Celebration',
-        date: '2026-04-19',
-        time: '5:00 PM',
-        location: 'The Grand Hall',
-        description: 'Join us for an unforgettable birthday celebration!',
-        image: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=500&q=80',
-        ticket_types: [
-            { id: 'mock-2-general', name: 'General Admission', price: 0 },
-        ]
-    },
-    {
-        id: 'mock-3',
-        name: 'Wedding Reception',
-        date: '2026-05-27',
-        time: '5:00 PM',
-        location: 'Rosewater Gardens',
-        description: 'John and Jane Doe invite you to celebrate their wedding reception.',
-        image: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=500&q=80',
-        ticket_types: [
-            { id: 'mock-3-general', name: 'General Admission', price: 0 },
-        ]
-    },
-    {
-        id: 'mock-4',
-        name: 'Tech Startup Pitch Night',
-        date: '2026-04-12',
-        time: '6:30 PM',
-        location: 'Innovation Hub',
-        description: 'Watch the next generation of startups pitch their ideas to investors.',
-        image: 'https://images.unsplash.com/photo-1556761175-4b46a572b786?w=500&q=80',
-        ticket_types: [
-            { id: 'mock-4-general', name: 'General Admission', price: 10.00 },
-            { id: 'mock-4-investor', name: 'Investor Pass', price: 75.00 },
-        ]
-    },
-]
-
 const Browse = () => {
+    const [events, setEvents] = useState([])
+    const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState('')
 
-    const filtered = MOCK_EVENTS.filter(e =>
-        e.name.toLowerCase().includes(search.toLowerCase()) ||
-        e.location.toLowerCase().includes(search.toLowerCase())
+    useEffect(() => {
+        const fetchEvents = async () => {
+            const { data, error } = await supabase
+                .from('events')
+                .select('*, ticket_types(*)')
+                .eq('status', 'published')
+                .order('date', { ascending: true })
+            
+            if (error) {
+                console.error('Error fetching events:', error)
+            } else {
+                setEvents(data || [])
+            }
+            setLoading(false)
+        }
+
+        fetchEvents()
+    }, [])
+
+    const filtered = events.filter(e =>
+        e.title?.toLowerCase().includes(search.toLowerCase()) ||
+        e.location?.toLowerCase().includes(search.toLowerCase())
     )
 
     return (
@@ -85,7 +53,9 @@ const Browse = () => {
                 />
             </div>
 
-            {filtered.length === 0 ? (
+            {loading ? (
+                <p style={{ color: '#888' }}>Loading events...</p>
+            ) : filtered.length === 0 ? (
                 <p style={{ color: '#888' }}>No events match your search.</p>
             ) : (
                 <div style={{

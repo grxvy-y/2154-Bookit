@@ -32,7 +32,7 @@
     gap: 0.5rem;
     height: 3.75rem;
     padding-inline: 1.5rem;
-    background: rgba(253, 249, 243, 0.88);
+    background: rgba(20, 18, 17, 0.88);
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
     border-bottom: 1px solid var(--color-border);
@@ -95,7 +95,7 @@
 
 .navbar-btn:hover {
     color: var(--color-text);
-    background: var(--color-cream-100);
+    background: var(--color-surface-alt);
     transform: translateY(-1px);
 }
 
@@ -106,7 +106,7 @@
 /* Highlighted state — add when the route is active */
 .navbar-btn--active {
     color: var(--color-accent);
-    background: color-mix(in oklch, var(--color-violet-500), transparent 92%);
+    background: color-mix(in oklch, var(--color-amber-500), transparent 90%);
 }
 
 /* Primary CTA button (filled gradient pill)
@@ -114,13 +114,13 @@
 .navbar-btn--cta {
     background: var(--gradient-brand);
     color: white;
-    box-shadow: 0 2px 8px -2px rgb(124 58 237 / 0.35);
+    box-shadow: 0 2px 8px -2px rgba(217, 119, 6, 0.35);
 }
 
 .navbar-btn--cta:hover {
     color: white;
     background: var(--gradient-brand);
-    box-shadow: 0 0 22px 4px rgb(139 92 246 / 0.3);
+    box-shadow: 0 0 22px 4px rgba(217, 119, 6, 0.3);
     transform: translateY(-1px);
 }
 
@@ -141,7 +141,7 @@
 }
 
 .navbar-icon-btn:hover {
-    background: var(--color-cream-100);
+    background: var(--color-surface-alt);
     color: var(--color-text);
     transform: scale(1.08);
 }
@@ -154,7 +154,7 @@
 .navbar-search {
     display: flex;
     align-items: center;
-    background: white;
+    background: var(--color-surface-card);
     border: 1.5px solid var(--color-border);
     border-radius: 9999px;
     padding: 0.3rem 0.875rem;
@@ -164,7 +164,7 @@
 
 .navbar-search:focus-within {
     border-color: var(--color-accent);
-    box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-violet-500), transparent 82%);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-amber-500), transparent 82%);
     width: 14rem;
 }
 
@@ -205,7 +205,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #7c3aed;
+    background: #d97706;
     color: white;
     font-size: 0.65rem;
     font-weight: 700;

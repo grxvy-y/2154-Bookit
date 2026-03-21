@@ -51,15 +51,16 @@ const Navbar = () => {
                 <Search />
             </div>
 
-            <div className="hidden md:block mr-2">
-                <Search />
-            </div>
-
             {/* Auth controls */}
             {user ? (
                 <div className="navbar-user">
-                    <span className="navbar-username">
+                    <span className="navbar-username" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                         {profile?.full_name || user.email}
+                        {profile?.role === 'organizer' && (
+                            <span title="Organizer" style={{ background: '#f59e0b', color: '#fff', fontSize: '0.65rem', padding: '0.15rem 0.3rem', borderRadius: '4px', fontWeight: 'bold', lineHeight: 1 }}>
+                                HOST
+                            </span>
+                        )}
                     </span>
                     <button className="navbar-btn navbar-btn--cta" onClick={handleSignOut}>
                         Sign Out

@@ -19,8 +19,12 @@ create table public.profiles (
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer as $$
 begin
-  insert into public.profiles (id, full_name)
-  values (new.id, new.raw_user_meta_data->>'full_name');
+  insert into public.profiles (id, full_name, role)
+  values (
+    new.id, 
+    new.raw_user_meta_data->>'full_name',
+    COALESCE(new.raw_user_meta_data->>'role', 'attendee')
+  );
   return new;
 end;
 $$;
@@ -45,7 +49,9 @@ create table public.events (
   capacity     int not null default 0,
   status       text not null default 'draft'
                  check (status in ('draft', 'published')),
-  created_at   timestamptz not null default now()
+  created_at   timestamptz not null default now(),
+  end_date     date,
+  recurring_days text
 );
 
 

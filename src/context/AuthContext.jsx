@@ -19,9 +19,11 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         // Get initial session
-        supabase.auth.getSession().then(({ data: { session } }) => {
+        supabase.auth.getSession().then(async ({ data: { session } }) => {
             setUser(session?.user ?? null)
-            if (session?.user) fetchProfile(session.user.id)
+            if (session?.user) {
+                await fetchProfile(session.user.id)
+            }
             setLoading(false)
         })
 
@@ -42,7 +44,7 @@ export const AuthProvider = ({ children }) => {
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
-            options: { data: { full_name: fullName } }
+            options: { data: { full_name: fullName, role: role } }
         })
         if (error) return { error }
 
@@ -52,6 +54,9 @@ export const AuthProvider = ({ children }) => {
                 .from('profiles')
                 .update({ role })
                 .eq('id', data.user.id)
+            
+            // Re-fetch profile to ensure UI gets updated role immediately
+            await fetchProfile(data.user.id)
         }
         return { data }
     }

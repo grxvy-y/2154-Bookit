@@ -19,17 +19,17 @@
 
 .cart-clear-btn {
     background: none;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-border);
     border-radius: 8px;
     padding: 0.4rem 0.8rem;
     font-size: 0.825rem;
-    color: #666;
+    color: var(--color-text-muted);
     cursor: pointer;
 }
 
 .cart-clear-btn:hover {
-    border-color: #999;
-    color: #333;
+    border-color: var(--color-stone-500);
+    color: var(--color-text);
 }
 
 /* Two-column layout */
@@ -58,8 +58,8 @@
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
-    background: white;
-    border: 1px solid #eaeaea;
+    background: var(--color-surface-card);
+    border: 1px solid var(--color-border);
     border-radius: 12px;
     padding: 1.25rem;
     flex-wrap: wrap;
@@ -78,7 +78,7 @@
 
 .cart-item__meta {
     font-size: 0.825rem;
-    color: #666;
+    color: var(--color-text-muted);
     margin: 0;
 }
 
@@ -93,7 +93,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-border);
     border-radius: 8px;
     padding: 0.2rem 0.4rem;
 }
@@ -104,13 +104,13 @@
     font-size: 1rem;
     font-weight: 700;
     cursor: pointer;
-    color: #333;
+    color: var(--color-text);
     width: 1.5rem;
     line-height: 1;
 }
 
 .cart-item__qty button:disabled {
-    color: #ccc;
+    color: var(--color-stone-600);
     cursor: default;
 }
 
@@ -143,8 +143,8 @@
 
 /* ── Order summary ── */
 .cart-summary {
-    background: white;
-    border: 1px solid #eaeaea;
+    background: var(--color-surface-card);
+    border: 1px solid var(--color-border);
     border-radius: 12px;
     padding: 1.5rem;
     position: sticky;
@@ -163,14 +163,14 @@
     gap: 0.5rem;
     margin-bottom: 1rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--color-border);
 }
 
 .cart-summary__row {
     display: flex;
     justify-content: space-between;
     font-size: 0.85rem;
-    color: #555;
+    color: var(--color-text-muted);
 }
 
 .cart-summary__total {
@@ -186,7 +186,7 @@
     width: 100%;
     text-align: center;
     padding: 0.75rem;
-    background: #000;
+    background: var(--color-accent);
     color: white;
     border-radius: 8px;
     text-decoration: none;
@@ -204,12 +204,12 @@
     text-align: center;
     margin-top: 0.75rem;
     font-size: 0.825rem;
-    color: #666;
+    color: var(--color-text-muted);
     text-decoration: none;
 }
 
 .cart-continue-link:hover {
-    color: #000;
+    color: var(--color-text);
 }
 
 /* ── Empty state ── */
@@ -236,13 +236,13 @@
 }
 
 .cart-empty p {
-    color: #666;
+    color: var(--color-text-muted);
     margin: 0 0 1.25rem;
 }
 
 .cart-browse-btn {
     padding: 0.65rem 1.5rem;
-    background: #000;
+    background: var(--color-accent);
     color: white;
     border-radius: 8px;
     text-decoration: none;
