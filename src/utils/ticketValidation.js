@@ -53,6 +53,7 @@ export async function validateTicket(qrCode) {
   if (ticket.is_used) {
     return {
       success: false,
+      alreadyUsed: true,
       message: 'Ticket already used.',
       ticket,
     }
@@ -70,7 +71,7 @@ export async function validateTicket(qrCode) {
   if (updateError || !updated) {
     if (!updateError) {
       // Another scanner won the race
-      return { success: false, message: 'Ticket already used.' }
+      return { success: false, alreadyUsed: true, message: 'Ticket already used.' }
     }
     console.error('Ticket update error:', updateError)
     return { success: false, message: 'Could not validate ticket. Try again.' }

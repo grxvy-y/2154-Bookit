@@ -69,7 +69,7 @@ export default function StaffScan() {
           ticketType: t?.ticket_types?.name || '—',
         },
       })
-    } else if (res.message.includes('already used')) {
+    } else if (res.alreadyUsed) {
       setResult({ type: 'warning', message: res.message, ticket: res.ticket })
     } else {
       setResult({ type: 'error', message: res.message })
@@ -138,6 +138,7 @@ export default function StaffScan() {
         <form className="manual-input-row" onSubmit={handleManualSubmit}>
           <input
             type="text"
+            aria-label="Ticket QR code"
             placeholder="Paste QR code UUID…"
             value={manualCode}
             onChange={(e) => setManualCode(e.target.value)}
