@@ -1,0 +1,137 @@
+.staff-scan-page {
+  min-height: 100vh;
+  background: var(--color-page-bg, #0f0f0f);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  color: white;
+}
+
+.staff-scan-page h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.staff-scan-page .subtitle {
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+
+.scanner-container {
+  width: 100%;
+  max-width: 500px;
+  background: #1a1a1a;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+#qr-reader {
+  width: 100%;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+#qr-reader video {
+  border-radius: 0.5rem;
+}
+
+.scan-controls {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+.result-card {
+  width: 100%;
+  max-width: 500px;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  animation: slideUp 0.3s ease;
+}
+
+.result-card.success {
+  background: rgba(0, 200, 100, 0.15);
+  border: 1px solid rgba(0, 200, 100, 0.4);
+}
+
+.result-card.error {
+  background: rgba(220, 60, 60, 0.15);
+  border: 1px solid rgba(220, 60, 60, 0.4);
+}
+
+.result-card.warning {
+  background: rgba(220, 150, 0, 0.15);
+  border: 1px solid rgba(220, 150, 0, 0.4);
+}
+
+.result-status {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.result-card.success .result-status { color: #00c864; }
+.result-card.error .result-status { color: #dc3c3c; }
+.result-card.warning .result-status { color: #dc9600; }
+
+.result-details {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.6;
+}
+
+.result-details strong {
+  color: white;
+}
+
+.scan-again-btn {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.manual-input-section {
+  width: 100%;
+  max-width: 500px;
+  margin-top: 1.5rem;
+}
+
+.manual-input-section h3 {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.manual-input-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.manual-input-row input {
+  flex: 1;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: #1a1a1a;
+  color: white;
+  font-size: 0.85rem;
+}
+
+.manual-input-row input::placeholder {
+  color: rgba(255,255,255,0.3);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

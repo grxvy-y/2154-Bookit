@@ -44,6 +44,9 @@
     .cart-layout {
         grid-template-columns: 1fr;
     }
+    .cart-summary {
+        width: 100%;
+    }
 }
 
 /* ── Line items ── */

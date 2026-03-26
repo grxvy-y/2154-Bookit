@@ -77,3 +77,13 @@
       gap: 0.5rem;
       flex-wrap: wrap;
   }
+
+  @media (max-width: 768px) {
+      .data-table-wrapper {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+      }
+      .stat-strip {
+          grid-template-columns: repeat(2, 1fr);
+      }
+  }
