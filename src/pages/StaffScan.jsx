@@ -45,7 +45,9 @@ export default function StaffScan() {
         await scannerRef.current.stop()
       }
       scannerRef.current.clear()
-    } catch (_) {}
+    } catch (err) {
+      console.error('Scanner stop error:', err)
+    }
     scannerRef.current = null
     setScannerActive(false)
   }
@@ -70,7 +72,18 @@ export default function StaffScan() {
         },
       })
     } else if (res.alreadyUsed) {
-      setResult({ type: 'warning', message: res.message, ticket: res.ticket })
+      const t = res.ticket
+      const event = t?.orders?.events
+      setResult({
+        type: 'warning',
+        message: res.message,
+        details: event ? {
+          event: event.title || 'Unknown Event',
+          date: event.date || '—',
+          location: event.location || '—',
+          ticketType: t?.ticket_types?.name || '—',
+        } : null,
+      })
     } else {
       setResult({ type: 'error', message: res.message })
     }

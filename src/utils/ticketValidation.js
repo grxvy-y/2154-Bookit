@@ -60,21 +60,21 @@ export async function validateTicket(qrCode) {
   }
 
   // Atomic conditional update — only succeeds if is_used is still false
-  const { data: updated, error: updateError } = await supabase
+  const { data: updatedRows, error: updateError } = await supabase
     .from('tickets')
     .update({ is_used: true })
     .eq('id', ticket.id)
     .eq('is_used', false)
     .select('id')
-    .single()
 
-  if (updateError || !updated) {
-    if (!updateError) {
-      // Another scanner won the race
-      return { success: false, alreadyUsed: true, message: 'Ticket already used.' }
-    }
+  if (updateError) {
     console.error('Ticket update error:', updateError)
     return { success: false, message: 'Could not validate ticket. Try again.' }
+  }
+
+  if (!updatedRows || updatedRows.length === 0) {
+    // Another scanner won the race
+    return { success: false, alreadyUsed: true, message: 'Ticket already used.' }
   }
 
   return {

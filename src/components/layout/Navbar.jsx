@@ -34,12 +34,10 @@ const Navbar = () => {
 
             {/* Only shown to organizers */}
             {profile?.role === 'organizer' && (
-                <NavLink to="/Organizer" className={({ isActive }) => `navbar-btn${isActive ? ' navbar-btn--active' : ''}`}>
-                    Organizer
-                </NavLink>
-            )}
-            {profile?.role === 'organizer' && (
+              <>
+                <NavLink to="/Organizer" className={({ isActive }) => `navbar-btn${isActive ? ' navbar-btn--active' : ''}`}>Organizer</NavLink>
                 <NavLink to="/staff/scan" className={({ isActive }) => `navbar-btn${isActive ? ' navbar-btn--active' : ''}`}>Scan Tickets</NavLink>
+              </>
             )}
 
             {/* Cart with live item count badge — only shown when logged in */}
