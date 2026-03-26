@@ -1,3 +1,4 @@
+// Cart — shows selected tickets with quantity controls and an order summary
 import { Link } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import '../assets/styles/Cart.css'

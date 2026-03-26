@@ -1,31 +1,44 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
+import { getEventCategoryAndImage } from '../utils/eventHelpers'
 import '../assets/styles/Home.css'
 
 const Home = () => {
-    // State to hold events, ready for future API integration
+    // State to hold events
     const [featuredEvents, setFeaturedEvents] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // TODO: Replace this simulated fetch with an actual API call later
-        // e.g. fetch('/api/events/featured').then(res => res.json()).then(data => setFeaturedEvents(data))
-
         const fetchEvents = async () => {
-            // Simulated fake delay
-            await new Promise(resolve => setTimeout(resolve, 500));
+            try {
+                const { data, error } = await supabase
+                    .from('events')
+                    .select('*, ticket_types(*)')
+                    .eq('status', 'published')
+                    .order('date', { ascending: true })
+                    .limit(5);
 
-            // Placeholder data for featured events (max 5)
-            const mockData = [
-                { id: 1, name: "Summer Networking Mixer", date: "Aug 15", category: "Networking", image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=500&q=80" },
-                { id: 2, name: "Community Basketball Tournament", date: "Sep 02", category: "Sports", image: "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=500&q=80" },
-                { id: 3, name: "Annual Wedding Expo", date: "Sep 20", category: "Wedding", image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=500&q=80" },
-                { id: 4, name: "Local Artists Showcase", date: "Oct 05", category: "Arts", image: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=500&q=80" },
-                { id: 5, name: "Tech Startup Pitch Night", date: "Oct 12", category: "Business", image: "https://images.unsplash.com/photo-1556761175-4b46a572b786?w=500&q=80" },
-            ];
-
-            setFeaturedEvents(mockData);
-            setIsLoading(false);
+                if (error) {
+                    console.error('Error fetching events:', error);
+                    setFeaturedEvents([]);
+                } else {
+                    const eventsWithImages = (data || []).map(evt => {
+                        const { category, defaultImage } = getEventCategoryAndImage(evt.title, evt.description);
+                        return {
+                            ...evt,
+                            name: evt.title,
+                            category,
+                            image: evt.image_url || defaultImage
+                        };
+                    });
+                    setFeaturedEvents(eventsWithImages);
+                }
+            } catch (err) {
+                console.error('Unexpected error fetching events:', err);
+            } finally {
+                setIsLoading(false);
+            }
         };
 
         fetchEvents();
@@ -71,25 +84,28 @@ const Home = () => {
                         <p>Secure your spot or grab a ticket before they run out.</p>
                     </div>
 
-                    <div className="flex flex-col gap-6 max-w-4xl mx-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
                         {isLoading ? (
-                            <div className="text-center py-10 text-stone-500">Loading events...</div>
+                            <div className="col-span-full text-center py-10 text-stone-500">Loading events...</div>
                         ) : featuredEvents.length === 0 ? (
-                            <div className="text-center py-10 text-stone-500">No events found.</div>
+                            <div className="col-span-full text-center py-10 text-stone-500">No events found.</div>
                         ) : (
-                            featuredEvents.map((evt) => (
-                                <div key={evt.id} className="card card-warm flex flex-col sm:flex-row overflow-hidden group">
-                                    <div className="sm:w-1/3 h-48 sm:h-auto relative overflow-hidden">
-                                        <img src={evt.image} alt={evt.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                            featuredEvents.map((evt, index) => (
+                                <div 
+                                    key={evt.id} 
+                                    className={`card card-warm flex flex-col overflow-hidden group ${index === 0 ? 'md:col-span-2 row-span-2' : ''}`}
+                                >
+                                    <div className={`relative overflow-hidden w-full ${index === 0 ? 'h-64 md:h-full min-h-64' : 'h-48'}`}>
+                                        <img src={evt.image} alt={evt.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                         {/* Overlay register button on hover */}
-                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                            <button className="btn btn-primary">Register Now</button>
+                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                                            <Link to="/Browse" className="btn btn-primary">Register Now</Link>
                                         </div>
                                     </div>
-                                    <div className="card-body sm:w-2/3 flex flex-col justify-center">
+                                    <div className="card-body flex flex-col justify-start grow">
                                         <span className="badge badge-violet self-start mb-2">{evt.category}</span>
-                                        <h3 className="ticket-title">{evt.name}</h3>
-                                        <p className="ticket-meta mt-2">🗓 {evt.date}</p>
+                                        <h3 className="ticket-title line-clamp-2" style={index === 0 ? { fontSize: '1.75rem', lineHeight: '2rem', marginBottom: '0.5rem' } : {}}>{evt.name}</h3>
+                                        <p className="ticket-meta mt-auto pt-4">🗓 {evt.date}</p>
                                     </div>
                                 </div>
                             ))
@@ -102,23 +118,23 @@ const Home = () => {
                     <div className="promo-grid">
 
                         {/* Box 1: Sign up as User */}
-                        <div className="promo-box promo-box-light relative overflow-hidden group cursor-pointer">
+                        <Link to="/register" className="promo-box promo-box-light relative overflow-hidden group text-inherit no-underline block">
                             <div className="absolute inset-0 z-0">
-                                <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80" alt="Join" className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity" />
+                                <img src="https://images.unsplash.com/photo-1593311902504-4031410a99c6?ixid=M3wxMjA3fDB8MXxzZWFyY2h8Mnx8dG9yb250byUyMGNvbW11bml0eXxlbnwwfHx8fDE3NzQwNTc4MjZ8MA&ixlib=rb-4.1.0&w=800&q=80" alt="Join" className="w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity" />
                             </div>
                             <div className="relative z-10 flex flex-col h-full justify-between">
                                 <div>
                                     <h3 className="text-xl font-bold mb-2">Join the Community</h3>
                                     <p className="text-sm">Sign up as a member to easily track your tickets and favorite events.</p>
                                 </div>
-                                <button className="btn btn-secondary self-start mt-4">Sign Up</button>
+                                <div className="mt-4 font-bold text-black" style={{ display: 'inline-block', background: 'white', padding: '0.6rem 1.25rem', borderRadius: '999px', fontSize: '0.875rem' }}>Sign Up</div>
                             </div>
-                        </div>
+                        </Link>
 
                         {/* Box 2: Browse More Events */}
                         <Link to="/Browse" className="promo-box promo-box-warm relative overflow-hidden group text-inherit no-underline block">
                             <div className="absolute inset-0 z-0">
-                                <img src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800&q=80" alt="Browse" className="w-full h-full object-cover opacity-10 group-hover:opacity-20 transition-opacity" />
+                                <img src="https://images.unsplash.com/photo-1720585534181-360e966ec790?ixid=M3wxMjA3fDB8MXxzZWFyY2h8Mnx8Y24rdG93ZXIrdG9yb250b3xlbnwwfHx8fDE3NzQwNTc4MjZ8MA&ixlib=rb-4.1.0&w=800&q=80" alt="Browse" className="w-full h-full object-cover opacity-10 group-hover:opacity-20 transition-opacity" />
                             </div>
                             <div className="relative z-10 flex flex-col h-full justify-between">
                                 <div>
@@ -132,7 +148,7 @@ const Home = () => {
                         {/* Box 3: Sign up as Organizer */}
                         <Link to="/Organizer" className="promo-box promo-box-dark relative overflow-hidden group text-inherit no-underline block">
                             <div className="absolute inset-0 z-0 bg-black/50">
-                                <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&q=80" alt="Organize" className="w-full h-full object-cover opacity-20 group-hover:opacity-40 transition-opacity mix-blend-overlay" />
+                                <img src="https://images.unsplash.com/photo-1441226119864-4f31075ed6c5?ixid=M3wxMjA3fDB8MXxzZWFyY2h8MXx8dG9yb250byUyMG9yZ2FuaXplcnxlbnwwfHx8fDE3NzQwNTc4MjZ8MA&ixlib=rb-4.1.0&w=800&q=80" alt="Organize" className="w-full h-full object-cover opacity-20 group-hover:opacity-40 transition-opacity mix-blend-overlay" />
                             </div>
                             <div className="relative z-10 flex flex-col h-full justify-between">
                                 <div>

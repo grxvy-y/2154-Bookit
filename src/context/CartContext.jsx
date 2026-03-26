@@ -1,8 +1,10 @@
+// CartContext — global shopping cart state, persisted to localStorage
 import { createContext, useContext, useEffect, useState } from 'react'
 
 const CartContext = createContext(null)
 
 export const CartProvider = ({ children }) => {
+    // Load saved cart from localStorage on first render
     const [cartItems, setCartItems] = useState(() => {
         try {
             const saved = localStorage.getItem('bookit_cart')
@@ -12,13 +14,13 @@ export const CartProvider = ({ children }) => {
         }
     })
 
-    // Persist to localStorage on every change
+    // Sync cart to localStorage whenever it changes
     useEffect(() => {
         localStorage.setItem('bookit_cart', JSON.stringify(cartItems))
     }, [cartItems])
 
+    // Adds an item to the cart, or increments quantity if it already exists
     const addToCart = (item) => {
-        // item: { id, eventId, eventTitle, ticketTypeId, ticketTypeName, price, quantity, date, location }
         setCartItems(prev => {
             const existing = prev.find(i => i.id === item.id)
             if (existing) {
@@ -32,10 +34,12 @@ export const CartProvider = ({ children }) => {
         })
     }
 
+    // Removes a single line item by ID
     const removeFromCart = (id) => {
         setCartItems(prev => prev.filter(i => i.id !== id))
     }
 
+    // Updates the quantity of a specific item (min 1)
     const updateQuantity = (id, quantity) => {
         if (quantity < 1) return
         setCartItems(prev =>
@@ -43,6 +47,7 @@ export const CartProvider = ({ children }) => {
         )
     }
 
+    // Clears the entire cart (called after checkout)
     const clearCart = () => setCartItems([])
 
     const cartTotal = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
@@ -55,6 +60,8 @@ export const CartProvider = ({ children }) => {
     )
 }
 
+// ── useCart hook ───────────────────────────────────────────────────────────────
+// Throws if used outside <CartProvider> so the error is immediately obvious.
 export const useCart = () => {
     const ctx = useContext(CartContext)
     if (!ctx) throw new Error('useCart must be used inside CartProvider')

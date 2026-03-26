@@ -1,3 +1,4 @@
+// Login — email/password sign-in form, redirects to home on success
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
