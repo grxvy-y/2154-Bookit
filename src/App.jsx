@@ -11,6 +11,7 @@ import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import StaffScan from './pages/StaffScan'
 
 const App = () => {
     return (
@@ -43,6 +44,14 @@ const App = () => {
                                 <Organizer />
                             </ProtectedRoute>
                         } />
+                        <Route
+                          path="/staff/scan"
+                          element={
+                            <ProtectedRoute requiredRole="organizer">
+                              <StaffScan />
+                            </ProtectedRoute>
+                          }
+                        />
 
                     </Route>
                 </Routes>

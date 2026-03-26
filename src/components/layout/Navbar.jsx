@@ -38,6 +38,9 @@ const Navbar = () => {
                     Organizer
                 </NavLink>
             )}
+            {profile?.role === 'organizer' && (
+                <NavLink to="/staff/scan">Scan Tickets</NavLink>
+            )}
 
             {/* Cart with live item count badge — only shown when logged in */}
             {user && (
