@@ -1,5 +1,7 @@
 import { supabase } from '../lib/supabase'
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 /**
  * Validates a QR code and marks the ticket as used if valid.
  * @param {string} qrCode - The scanned QR code string (UUID)
@@ -8,6 +10,12 @@ import { supabase } from '../lib/supabase'
 export async function validateTicket(qrCode) {
   if (!qrCode || !qrCode.trim()) {
     return { success: false, message: 'No QR code provided.' }
+  }
+
+  const code = qrCode.trim()
+
+  if (!UUID_REGEX.test(code)) {
+    return { success: false, message: 'Invalid QR code format.' }
   }
 
   // Fetch ticket with related event and order info
@@ -34,10 +42,11 @@ export async function validateTicket(qrCode) {
         price
       )
     `)
-    .eq('qr_code', qrCode.trim())
+    .eq('qr_code', code)
     .single()
 
   if (error || !ticket) {
+    console.error('Ticket lookup error:', error)
     return { success: false, message: 'Invalid ticket — QR code not found.' }
   }
 
@@ -49,13 +58,21 @@ export async function validateTicket(qrCode) {
     }
   }
 
-  // Mark as used
-  const { error: updateError } = await supabase
+  // Atomic conditional update — only succeeds if is_used is still false
+  const { data: updated, error: updateError } = await supabase
     .from('tickets')
     .update({ is_used: true })
     .eq('id', ticket.id)
+    .eq('is_used', false)
+    .select('id')
+    .single()
 
-  if (updateError) {
+  if (updateError || !updated) {
+    if (!updateError) {
+      // Another scanner won the race
+      return { success: false, message: 'Ticket already used.' }
+    }
+    console.error('Ticket update error:', updateError)
     return { success: false, message: 'Could not validate ticket. Try again.' }
   }
 
