@@ -10,6 +10,7 @@
 create table public.profiles (
   id         uuid primary key references auth.users(id) on delete cascade,
   full_name  text,
+  email      text,
   role       text not null default 'attendee'
                check (role in ('attendee', 'organizer', 'venue_staff', 'admin')),
   created_at timestamptz not null default now()
@@ -19,10 +20,11 @@ create table public.profiles (
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer as $$
 begin
-  insert into public.profiles (id, full_name, role)
+  insert into public.profiles (id, full_name, email, role)
   values (
     new.id, 
     new.raw_user_meta_data->>'full_name',
+    new.email,
     COALESCE(new.raw_user_meta_data->>'role', 'attendee')
   );
   return new;
@@ -124,6 +126,17 @@ create policy "profiles: update own"
   on public.profiles for update
   using (auth.uid() = id);
 
+-- Organizers can read profiles of attendees who have placed an order for their events.
+create policy "profiles: organizer read attendees"
+  on public.profiles for select
+  using (
+    exists (
+      select 1 from public.orders
+      join public.events on events.id = orders.event_id
+      where orders.user_id = profiles.id
+        and events.organizer_id = auth.uid()
+    )
+  );
 
 -- ────────────────────────────────────────────────────────────
 -- EVENTS policies
@@ -240,6 +253,16 @@ create policy "orders: update own"
   on public.orders for update
   using (auth.uid() = user_id);
 
+-- Organizers can delete orders for their events
+create policy "orders: organizer delete"
+  on public.orders for delete
+  using (
+    exists (
+      select 1 from public.events
+      where events.id = orders.event_id
+        and events.organizer_id = auth.uid()
+    )
+  );
 
 -- ────────────────────────────────────────────────────────────
 -- TICKETS policies

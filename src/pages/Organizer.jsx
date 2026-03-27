@@ -15,6 +15,11 @@ const Organizer = () => {
     // null = create mode, event object = edit mode
     const [editingEvent, setEditingEvent] = useState(null);
 
+    const [attendeesModalEvent, setAttendeesModalEvent] = useState(null);
+    const [attendees, setAttendees] = useState([]);
+    const [loadingAttendees, setLoadingAttendees] = useState(false);
+    const [attendeeFetchError, setAttendeeFetchError] = useState(null);
+
     // KPI stats: revenue and tickets sold are fetched live; views is a static placeholder
     const [stats, setStats] = useState({ revenue: 0, sold: 0, views: '1.2k' });
 
@@ -108,6 +113,88 @@ const Organizer = () => {
         setFormData({ title: '', date: '', time: '', location: '', description: '', capacity: 0, eventType: 'free', price: '', endDate: '', recurringDays: [], rsvpCode: '' });
         setEditingEvent(null);
         setShowForm(false);
+    };
+
+    // ── fetchAttendees ─────────────────────────────────────────────────────────
+    // Two-step fetch: orders first, then profiles by user ID.
+    // This avoids relying on the nested join which breaks if `profiles.email`
+    // column doesn't exist yet on the live DB.
+
+    const fetchAttendees = async (event) => {
+        setAttendeesModalEvent(event);
+        setLoadingAttendees(true);
+        setAttendees([]);
+        setAttendeeFetchError(null);
+
+        // Step 1: get orders for this event
+        const { data: ordersData, error: ordersError } = await supabase
+            .from('orders')
+            .select('id, user_id, status')
+            .eq('event_id', event.id)
+            .in('status', ['confirmed', 'pending']);
+
+        if (ordersError) {
+            console.error('Error fetching orders:', ordersError);
+            setAttendeeFetchError(`Error fetching orders: [${ordersError.code}] ${ordersError.message}`);
+            setLoadingAttendees(false);
+            return;
+        }
+
+        if (!ordersData || ordersData.length === 0) {
+            setLoadingAttendees(false);
+            return;
+        }
+
+        // Step 2: get profiles for all user IDs found in those orders
+        const userIds = [...new Set(ordersData.map(o => o.user_id))];
+        const { data: profilesData, error: profilesError } = await supabase
+            .from('profiles')
+            .select('id, full_name, email')
+            .in('id', userIds);
+
+        if (profilesError) {
+            console.error('Error fetching profiles:', profilesError);
+            setAttendeeFetchError(`Error fetching profiles: [${profilesError.code}] ${profilesError.message}. ${profilesError.code === '42703' ? 'The email column may not exist in your live database.' : 'Check RLS policies in Supabase.'}`);
+            setLoadingAttendees(false);
+            return;
+        }
+
+        // Map profiles by user ID for fast lookup
+        const profileMap = {};
+        (profilesData || []).forEach(p => { profileMap[p.id] = p; });
+
+        const formattedAttendees = ordersData.map(order => ({
+            orderId: order.id,
+            userId: order.user_id,
+            name: profileMap[order.user_id]?.full_name || 'Unknown',
+            email: profileMap[order.user_id]?.email || 'N/A',
+            status: order.status
+        }));
+        setAttendees(formattedAttendees);
+        setLoadingAttendees(false);
+    };
+
+    const closeAttendeesModal = () => {
+        setAttendeesModalEvent(null);
+        setAttendees([]);
+    };
+
+    // ── handleDeleteAttendance ──────────────────────────────────────────────────
+    const handleDeleteAttendance = async (orderId) => {
+        if (!window.confirm('Are you sure you want to remove this attendee? Their order and tickets will be permanently deleted.')) return;
+
+        const { error } = await supabase
+            .from('orders')
+            .delete()
+            .eq('id', orderId);
+
+        if (error) {
+            console.error('Error removing attendee:', error);
+            alert('Failed to remove attendee. Ensure you have the proper RLS policies.');
+        } else {
+            setAttendees(prev => prev.filter(a => a.orderId !== orderId));
+            fetchEvents(); // Update stats
+        }
     };
 
     // ── handleCreateOrUpdate ───────────────────────────────────────────────────
@@ -449,6 +536,7 @@ const Organizer = () => {
                                             <td>{event.capacity}</td>
                                             <td>
                                                 <div className="action-row" style={{ display: 'flex', gap: '0.5rem' }}>
+                                                    <button onClick={() => fetchAttendees(event)} style={{ background: 'transparent', border: '1px solid var(--color-border)', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-text)' }}>Attendees</button>
                                                     <button onClick={() => handleEdit(event)} style={{ background: 'transparent', border: '1px solid var(--color-border)', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', color: 'var(--color-text)' }}>Edit</button>
                                                     {event.status === 'draft' && (
                                                         <button onClick={() => handlePublish(event.id)} style={{ background: 'color-mix(in oklch, var(--color-amber-500), transparent 85%)', color: 'var(--color-amber-400)', border: 'none', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}>Publish</button>
@@ -471,6 +559,57 @@ const Organizer = () => {
                     )}
                 </div>
             </section>
+
+            {/* Attendees Modal */}
+            {attendeesModalEvent && (
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '1rem' }}>
+                    <div style={{ background: 'var(--color-surface-card)', padding: '2rem', borderRadius: '8px', border: '1px solid var(--color-border)', width: '100%', maxWidth: '600px', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                            <h3 style={{ margin: 0, color: 'var(--color-text)' }}>Attendees: {attendeesModalEvent.title}</h3>
+                            <button onClick={closeAttendeesModal} style={{ background: 'transparent', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: 'var(--color-text)' }}>&times;</button>
+                        </div>
+                        
+                        <div style={{ overflowY: 'auto', flex: 1 }}>
+                            {loadingAttendees ? (
+                                <p style={{ color: 'var(--color-text-muted)', textAlign: 'center', padding: '2rem' }}>Loading attendees...</p>
+                            ) : attendeeFetchError ? (
+                                <div style={{ padding: '1.5rem', background: 'color-mix(in oklch, #ef4444, transparent 90%)', borderRadius: '6px', margin: '1rem 0' }}>
+                                    <p style={{ color: '#ef4444', fontWeight: '600', marginBottom: '0.5rem' }}>Could not load attendees</p>
+                                    <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', fontFamily: 'monospace' }}>{attendeeFetchError}</p>
+                                </div>
+                            ) : attendees.length === 0 ? (
+                                <p style={{ color: 'var(--color-text-muted)', textAlign: 'center', padding: '2rem' }}>No attendees found for this event.</p>
+                            ) : (
+                                <table className="data-table" style={{ width: '100%' }}>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th style={{ textAlign: 'right' }}>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {attendees.map(att => (
+                                            <tr key={att.orderId}>
+                                                <td>{att.name}</td>
+                                                <td>{att.email}</td>
+                                                <td style={{ textAlign: 'right' }}>
+                                                    <button 
+                                                        onClick={() => handleDeleteAttendance(att.orderId)}
+                                                        style={{ background: 'color-mix(in oklch, #ef4444, transparent 85%)', color: '#ef4444', border: 'none', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}
+                                                    >
+                                                        Remove
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
