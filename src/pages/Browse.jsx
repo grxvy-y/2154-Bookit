@@ -1,5 +1,6 @@
 // Browse — lists all published events with a client-side search filter
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import EventCard from '../components/events/EventCard'
 import '../assets/styles/Event.css'
@@ -7,7 +8,8 @@ import '../assets/styles/Event.css'
 const Browse = () => {
     const [events, setEvents] = useState([])
     const [loading, setLoading] = useState(true)
-    const [search, setSearch] = useState('')
+    const [searchParams] = useSearchParams()
+    const [search, setSearch] = useState(searchParams.get('search') || '')
 
     useEffect(() => {
         const fetchEvents = async () => {

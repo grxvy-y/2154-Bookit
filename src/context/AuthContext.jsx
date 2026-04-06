@@ -51,6 +51,7 @@ export const AuthProvider = ({ children }) => {
                 fetchProfile(session.user.id)
             } else {
                 setProfile(null)
+                localStorage.removeItem('bookit_cart')
             }
         })
 
