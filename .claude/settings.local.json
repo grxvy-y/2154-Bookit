@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc:*)",
+      "Bash(npm install:*)",
+      "Bash(node -e \"const p = require\\(''./package.json''\\); console.log\\(p.dependencies[''html5-qrcode'']\\)\")",
+      "Read(//c/Users/Ben/Desktop/class-projects/y2-winter/2154/group-assignment/2154-Bookit-fresh/src/components/auth/**)",
+      "Read(//c/Users/Ben/Desktop/class-projects/y2-winter/2154/group-assignment/2154-Bookit-fresh/src/context/**)",
+      "Read(//c/Users/Ben/Desktop/class-projects/y2-winter/2154/group-assignment/2154-Bookit-fresh/src/utils/**)",
+      "Read(//c/Users/Ben/Desktop/class-projects/y2-winter/2154/group-assignment/2154-Bookit-fresh/src/lib/**)"
+    ]
+  }
+}
