@@ -40,6 +40,18 @@ const Navbar = () => {
               </>
             )}
 
+            {/* Scan Tickets for venue staff */}
+            {profile?.role === 'venue_staff' && (
+              <NavLink to="/staff/scan" className={({ isActive }) => `navbar-btn${isActive ? ' navbar-btn--active' : ''}`}>Scan Tickets</NavLink>
+            )}
+
+            {/* My Tickets — only shown to logged-in attendees */}
+            {user && profile?.role === 'attendee' && (
+                <NavLink to="/my-tickets" className={({ isActive }) => `navbar-btn${isActive ? ' navbar-btn--active' : ''}`}>
+                    My Tickets
+                </NavLink>
+            )}
+
             {/* Cart with live item count badge — only shown when logged in */}
             {user && (
                 <NavLink to="/Cart" className={({ isActive }) => `navbar-btn${isActive ? ' navbar-btn--active' : ''}`}>

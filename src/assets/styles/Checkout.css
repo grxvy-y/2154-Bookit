@@ -287,3 +287,32 @@
     word-break: break-all;
     border: 1px solid var(--color-border);
 }
+
+.checkout-confirm__ticket {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: var(--radius-md);
+}
+
+.checkout-confirm__ticket-label {
+    font-size: 0.8rem;
+    color: #555;
+    margin: 0;
+}
+
+.checkout-confirm__qr-hint {
+    font-size: 0.75rem;
+    color: #888;
+    margin: 0;
+}
+
+.checkout-confirm__ref-id {
+    font-size: 0.875rem;
+    margin: 0.5rem 0 0;
+    color: var(--color-text);
+}

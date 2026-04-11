@@ -12,6 +12,8 @@ import Checkout from './pages/Checkout'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import StaffScan from './pages/StaffScan'
+import MyTickets from './pages/MyTickets'
+import TicketView from './pages/TicketView'
 
 const App = () => {
     return (
@@ -26,6 +28,11 @@ const App = () => {
                         <Route path="/Browse" element={<Browse />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route path="/ticket/:id" element={
+                            <ProtectedRoute>
+                                <TicketView />
+                            </ProtectedRoute>
+                        } />
 
                         {/* Protected routes — require login */}
                         <Route path="/Cart" element={
@@ -38,6 +45,12 @@ const App = () => {
                                 <Checkout />
                             </ProtectedRoute>
                         } />
+                        <Route path="/my-tickets" element={
+                            <ProtectedRoute>
+                                <MyTickets />
+                            </ProtectedRoute>
+                        } />
+
                         {/* Organizer dashboard — requires role='organizer' */}
                         <Route path="/Organizer" element={
                             <ProtectedRoute requiredRole="organizer">
@@ -47,7 +60,7 @@ const App = () => {
                         <Route
                           path="/staff/scan"
                           element={
-                            <ProtectedRoute requiredRole="organizer">
+                            <ProtectedRoute requiredRole={['organizer', 'venue_staff']}>
                               <StaffScan />
                             </ProtectedRoute>
                           }

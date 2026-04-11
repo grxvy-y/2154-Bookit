@@ -12,7 +12,10 @@ export async function validateTicket(qrCode) {
     return { success: false, message: 'No QR code provided.' }
   }
 
-  const code = qrCode.trim()
+  // Support both raw UUIDs and URL-encoded QR codes (e.g. https://project-s0w2d.vercel.app/ticket/{uuid})
+  const raw = qrCode.trim()
+  const uuidMatch = raw.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i)
+  const code = uuidMatch ? uuidMatch[0] : raw
 
   if (!UUID_REGEX.test(code)) {
     return { success: false, message: 'Invalid QR code format.' }

@@ -1,6 +1,7 @@
 // Checkout — 3-step flow: Review → Payment (simulated) → Confirmation
 // Writes one orders row + one tickets row per ticket to Supabase on completion.
 import { useState } from 'react'
+import { QRCodeSVG } from 'qrcode.react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
@@ -160,15 +161,34 @@ const ConfirmationStep = ({ orderRefs }) => (
         <div className="checkout-confirm__icon">🎉</div>
         <h2>You're booked!</h2>
         <p className="checkout-confirm__sub">
-            Your order has been confirmed. Check your email for your tickets.
+            Your order has been confirmed. Screenshot your ticket QR codes below.
         </p>
         {orderRefs.length > 0 && (
             <div className="checkout-confirm__refs">
                 {orderRefs.map(ref => (
-                    <p key={ref.id} className="checkout-confirm__ref">
-                        <strong>{ref.eventTitle}</strong><br />
-                        Order ID: <code>{ref.id}</code>
-                    </p>
+                    <div key={ref.id} className="checkout-confirm__ref">
+                        <strong>{ref.eventTitle}</strong>
+                        {ref.tickets && ref.tickets.length > 0 ? (
+                            ref.tickets.map((ticket, i) => (
+                                <div key={ticket.qr_code} className="checkout-confirm__ticket">
+                                    {ref.tickets.length > 1 && (
+                                        <p className="checkout-confirm__ticket-label">
+                                            Ticket {i + 1}{ticket.ticket_types?.name ? ` — ${ticket.ticket_types.name}` : ''}
+                                        </p>
+                                    )}
+                                    <QRCodeSVG
+                                        value={`https://project-s0w2d.vercel.app/ticket/${ticket.qr_code}`}
+                                        size={180}
+                                        bgColor="#ffffff"
+                                        fgColor="#000000"
+                                    />
+                                    <p className="checkout-confirm__qr-hint">Show this at the door</p>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="checkout-confirm__ref-id">Order ID: <code>{ref.id}</code></p>
+                        )}
+                    </div>
                 ))}
             </div>
         )}
@@ -209,13 +229,33 @@ const Checkout = () => {
 
         for (const group of Object.values(groups)) {
             // Skip DB write for placeholder mock events (no real UUID)
-            // Mock events can be used for UI testing without needing real Supabase data
             if (group.eventId.startsWith('mock-')) {
-                refs.push({ id: `MOCK-${Date.now()}`, eventTitle: group.eventTitle })
+                refs.push({ id: `MOCK-${Date.now()}`, eventTitle: group.eventTitle, tickets: [] })
                 continue
             }
 
-            // Create order
+            // ── Capacity check (before creating any order) ───────────────────
+            const ticketTypeIds = group.items.map(i => i.ticketTypeId)
+            const totalRequested = group.items.reduce((sum, i) => sum + i.quantity, 0)
+
+            const { count: soldCount } = await supabase
+                .from('tickets')
+                .select('id', { count: 'exact', head: true })
+                .in('ticket_type_id', ticketTypeIds)
+
+            const { data: typeData } = await supabase
+                .from('ticket_types')
+                .select('quantity')
+                .in('id', ticketTypeIds)
+
+            const totalCapacity = (typeData || []).reduce((sum, t) => sum + (t.quantity || 0), 0)
+
+            if ((soldCount || 0) + totalRequested > totalCapacity) {
+                alert(`Sorry, not enough tickets remaining for "${group.eventTitle}".`)
+                continue
+            }
+
+            // ── Create order ─────────────────────────────────────────────────
             const { data: order, error: orderErr } = await supabase
                 .from('orders')
                 .insert({
@@ -232,7 +272,7 @@ const Checkout = () => {
                 continue
             }
 
-            // Create one ticket row per individual ticket.
+            // ── Create tickets ───────────────────────────────────────────────
             // Each ticket gets a unique QR code generated client-side via the Web Crypto API.
             // In a production app this should be generated server-side for security.
             const ticketRows = []
@@ -247,13 +287,31 @@ const Checkout = () => {
                 }
             }
 
-            await supabase.from('tickets').insert(ticketRows)
-            refs.push({ id: order.id, eventTitle: group.eventTitle })
+            const { data: insertedTickets, error: ticketErr } = await supabase
+                .from('tickets')
+                .insert(ticketRows)
+                .select('qr_code, ticket_types(name)')
+
+            if (ticketErr) {
+                console.error('Ticket insert failed:', ticketErr)
+                // Mark the order cancelled rather than deleting — preserves the audit trail
+                await supabase.from('orders').update({ status: 'cancelled' }).eq('id', order.id)
+                alert(`Something went wrong issuing tickets for "${group.eventTitle}". Please try again.`)
+                continue
+            }
+
+            refs.push({ id: order.id, eventTitle: group.eventTitle, tickets: insertedTickets || [] })
+        }
+
+        setLoading(false)
+
+        if (refs.length === 0) {
+            // Every group failed — stay on payment step so the user can try again
+            return
         }
 
         setOrderRefs(refs)
         clearCart()
-        setLoading(false)
         setStep(3)
     }
 

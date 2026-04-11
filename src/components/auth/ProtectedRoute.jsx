@@ -21,7 +21,8 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     )
 
     // Logged in but wrong role — show permission error
-    if (requiredRole && profile?.role !== requiredRole) {
+    const allowedRoles = Array.isArray(requiredRole) ? requiredRole : [requiredRole]
+    if (requiredRole && !allowedRoles.includes(profile?.role)) {
         return (
             <div style={{ padding: '5rem 2rem', textAlign: 'center', background: '#ffebee', color: '#c62828', minHeight: '60vh' }}>
                 <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Access Denied: Wrong Role</h2>
