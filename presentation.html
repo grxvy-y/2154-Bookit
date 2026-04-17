@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Bookit — Final Presentation</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reset.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Mono:wght@300;400&display=swap"/>
+  <style>
+    /* ── Base ── */
+    :root {
+      --navy:   #1a3a6b;
+      --ink:    #222;
+      --mid:    #666;
+      --light:  #999;
+      --rule:   #e2dcd3;
+      --warm:   #f8f5f1;
+      --white:  #ffffff;
+      --accent: #c8a96e;
+    }
+
+    .reveal-viewport { background: var(--white); }
+    .reveal { font-family: "DM Sans", sans-serif; color: var(--ink); font-weight: 300; }
+
+    /* ── Slides ── */
+    .reveal .slides section {
+      text-align: left;
+      padding: 0 4rem;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* ── Typography ── */
+    .reveal h1 {
+      font-family: "DM Sans", sans-serif;
+      font-size: 2.3rem;
+      font-weight: 300;
+      color: var(--navy);
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 0.35rem;
+    }
+    .reveal h2 {
+      font-family: "DM Sans", sans-serif;
+      font-size: 1.45rem;
+      font-weight: 400;
+      color: var(--navy);
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 0.35rem;
+      margin-bottom: 0.9rem;
+      letter-spacing: -0.01em;
+    }
+    .reveal h3 {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--light);
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-family: "DM Sans", sans-serif;
+    }
+    .reveal p {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: var(--ink);
+      margin: 0.25rem 0;
+      font-weight: 300;
+    }
+    .reveal ul {
+      list-style: none;
+      padding: 0;
+      margin: 0.4rem 0;
+    }
+    .reveal ul li {
+      font-size: 0.9rem;
+      line-height: 1.75;
+      color: var(--ink);
+      padding-left: 1.1rem;
+      position: relative;
+      font-weight: 300;
+    }
+    .reveal ul li::before {
+      content: "·";
+      position: absolute;
+      left: 0.1rem;
+      color: var(--accent);
+      font-size: 1.1em;
+    }
+    .reveal code {
+      font-family: "DM Mono", "Courier New", monospace;
+      font-size: 0.82em;
+      background: var(--warm);
+      padding: 0.1em 0.4em;
+      border-radius: 3px;
+      color: var(--navy);
+      font-weight: 300;
+    }
+
+    /* ── Cover slide ── */
+    .cover-slide {
+      text-align: center !important;
+      align-items: center !important;
+      background: var(--white);
+    }
+    .cover-slide .eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--light);
+      margin-bottom: 1.4rem;
+      font-weight: 400;
+    }
+    .cover-slide h1 {
+      font-size: 3.6rem;
+      font-weight: 300;
+      color: var(--navy);
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.03em;
+    }
+    .cover-slide .subtitle {
+      font-size: 0.95rem;
+      color: var(--mid);
+      font-style: italic;
+      margin-bottom: 2rem;
+      font-weight: 300;
+    }
+    .cover-slide .meta {
+      font-size: 0.82rem;
+      color: var(--light);
+      line-height: 2;
+      font-weight: 300;
+    }
+    .cover-slide .rule-line {
+      width: 2rem;
+      height: 1px;
+      background: var(--accent);
+      margin: 1.2rem auto;
+    }
+
+    /* ── Agenda slide ── */
+    .agenda-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem 2rem;
+      margin-top: 0.5rem;
+    }
+    .agenda-item {
+      display: flex;
+      align-items: baseline;
+      gap: 0.7rem;
+    }
+    .agenda-item .timestamp {
+      font-size: 0.7rem;
+      color: var(--accent);
+      font-family: "DM Mono", "Courier New", monospace;
+      white-space: nowrap;
+      flex-shrink: 0;
+      font-weight: 300;
+    }
+    .agenda-item .label {
+      font-size: 0.9rem;
+      color: var(--ink);
+    }
+
+    /* ── Two-col layout ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 0.5rem;
+    }
+    .col-block h3 { margin-top: 0; }
+
+    /* ── Stat row ── */
+    .stat-row {
+      display: flex;
+      gap: 2.5rem;
+      margin: 1rem 0;
+    }
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .stat .num {
+      font-size: 2.2rem;
+      color: var(--navy);
+      font-family: "DM Sans", sans-serif;
+      font-weight: 300;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .stat .lbl {
+      font-size: 0.68rem;
+      color: var(--light);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 0.25rem;
+      font-weight: 400;
+    }
+
+    /* ── Tag pills ── */
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin: 0.6rem 0;
+    }
+    .tag {
+      font-size: 0.7rem;
+      font-family: "DM Mono", "Courier New", monospace;
+      background: transparent;
+      border: 1px solid var(--rule);
+      color: var(--mid);
+      padding: 0.2em 0.6em;
+      border-radius: 3px;
+      font-weight: 300;
+    }
+
+    /* ── Section divider ── */
+    .divider-slide {
+      text-align: center !important;
+      align-items: center !important;
+      background: var(--white);
+    }
+    .divider-slide .section-num {
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      font-weight: 400;
+    }
+    .divider-slide h1 {
+      font-size: 2.4rem;
+      font-weight: 300;
+      color: var(--navy);
+      letter-spacing: -0.02em;
+    }
+
+    /* ── Demo slide ── */
+    .demo-box {
+      border-bottom: 1px solid var(--rule);
+      padding: 0.65rem 0;
+      margin: 0;
+    }
+    .demo-box:first-of-type { border-top: 1px solid var(--rule); }
+    .demo-box .flow {
+      font-size: 0.72rem;
+      color: var(--accent);
+      font-family: "DM Mono", "Courier New", monospace;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+    .demo-box p {
+      font-size: 0.88rem;
+      color: var(--ink);
+      margin: 0.15rem 0 0;
+      font-weight: 300;
+    }
+
+    /* ── Architecture layers ── */
+    .arch-layer {
+      border-bottom: 1px solid var(--rule);
+      padding: 0.55rem 0;
+      margin: 0;
+      display: flex;
+      align-items: baseline;
+      gap: 1.2rem;
+    }
+    .arch-layer:first-of-type { border-top: 1px solid var(--rule); }
+    .arch-layer .layer-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--light);
+      width: 5.5rem;
+      flex-shrink: 0;
+      font-weight: 400;
+    }
+    .arch-layer .layer-content {
+      font-size: 0.88rem;
+      color: var(--ink);
+      font-weight: 300;
+    }
+    .arch-layer.pres .layer-label { color: #b05050; }
+    .arch-layer.app  .layer-label { color: #3a8a7e; }
+    .arch-layer.data .layer-label { color: #9a7c20; }
+
+    /* ── Demo media layout ── */
+    .demo-media-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+    .demo-media-text { display: flex; flex-direction: column; }
+    .demo-media-img { display: flex; align-items: center; justify-content: center; }
+
+    /* ── Image carousel ── */
+    .img-carousel {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .img-carousel-track {
+      width: 100%;
+      height: 300px;
+      overflow: hidden;
+      border-radius: 4px;
+      border: 1px solid var(--rule);
+      position: relative;
+      background: var(--warm);
+    }
+    .img-carousel-track img {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .img-carousel-track img.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .img-carousel-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .img-carousel-controls button {
+      background: none;
+      border: 1px solid var(--rule);
+      color: var(--mid);
+      width: 1.6rem;
+      height: 1.6rem;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      line-height: 1;
+      padding: 0;
+    }
+    .img-carousel-controls button:hover { border-color: var(--accent); color: var(--accent); }
+    .img-carousel-dots { display: flex; gap: 0.3rem; }
+    .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--rule); }
+    .dot.active { background: var(--accent); }
+
+    /* ── Progress bar ── */
+    .reveal .progress { background: var(--rule); color: var(--navy); }
+
+    /* ── Slide number ── */
+    .reveal .slide-number {
+      font-family: "Courier New", monospace;
+      font-size: 0.65rem;
+      color: var(--light);
+      background: transparent;
+    }
+
+    /* ── Fragment fade ── */
+    .reveal .fragment { opacity: 0; }
+    .reveal .fragment.visible { opacity: 1; }
+
+    /* ── Footer label ── */
+    .slide-footer {
+      position: absolute;
+      bottom: 1.2rem;
+      left: 3.5rem;
+      font-size: 0.65rem;
+      color: var(--rule);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-family: "Courier New", monospace;
+    }
+  </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ══════════════════════════
+     1. COVER
+══════════════════════════ -->
+<section class="cover-slide">
+  <div class="eyebrow">COMP 2154 · Group 48 · Final Presentation</div>
+  <h1>Bookit</h1>
+  <div class="subtitle">A web-based event ticketing platform</div>
+  <div class="rule-line"></div>
+  <div class="meta">
+    Paul Yee <span style="color:var(--light);font-size:0.85em;">101489873</span> &nbsp;·&nbsp; Ben Morrison <span style="color:var(--light);font-size:0.85em;">101572409</span><br/>
+    April 17, 2026
+  </div>
+</section>
+
+<!-- ══════════════════════════
+     2. AGENDA
+══════════════════════════ -->
+<section>
+  <div class="slide-footer">Bookit · Group 48</div>
+  <h2>Agenda</h2>
+  <div class="agenda-grid">
+    <div class="agenda-item">
+      <span class="timestamp">0:00 – 0:30</span>
+      <span class="label">Introduction</span>
+    </div>
+    <div class="agenda-item">
+      <span class="timestamp">0:30 – 1:30</span>
+      <span class="label">Problem Statement</span>
+    </div>
+    <div class="agenda-item">
+      <span class="timestamp">1:30 – 2:30</span>
+      <span class="label">Solution &amp; Architecture</span>
+    </div>
+    <div class="agenda-item">
+      <span class="timestamp">2:30 – 4:30</span>
+      <span class="label">Live Demo</span>
+    </div>
+    <div class="agenda-item">
+      <span class="timestamp">4:30 – 5:00</span>
+      <span class="label">Conclusion &amp; Future Work</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════
+     DIVIDER — PROBLEM
+══════════════════════════ -->
+<section class="divider-slide">
+  <div class="section-num">01</div>
+  <h1>Problem Statement</h1>
+</section>
+
+<!-- ══════════════════════════
+     3. PROBLEM
+══════════════════════════ -->
+<section>
+  <div class="slide-footer">Bookit · Group 48</div>
+  <h2>The Problem</h2>
+  <p>Community event organizers rely on <strong>manual, in-person registration</strong>. There is no way to:</p>
+  <ul style="margin: 0.8rem 0;">
+    <li>Browse and purchase tickets online</li>
+    <li>Receive a digital ticket after purchase</li>
+    <li>Monitor real-time sales and capacity</li>
+    <li>Validate tickets at entry without manual checking</li>
+  </ul>
+  <div class="stat-row" style="margin-top: 1.4rem;">
+    <div class="stat"><span class="num">3</span><span class="lbl">Affected roles</span></div>
+    <div class="stat"><span class="num">0</span><span class="lbl">Online touchpoints</span></div>
+    <div class="stat"><span class="num">100%</span><span class="lbl">Manual overhead</span></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════
+     4. STAKEHOLDERS
+══════════════════════════ -->
+<section>
+  <div class="slide-footer">Bookit · Group 48</div>
+  <h2>Stakeholders</h2>
+  <div class="two-col">
+    <div class="col-block">
+      <h3>Event Attendees</h3>
+      <ul>
+        <li>Discover &amp; browse events</li>
+        <li>Purchase tickets online</li>
+        <li>Access digital QR tickets</li>
+      </ul>
+    </div>
+    <div class="col-block">
+      <h3>Event Organizers</h3>
+      <ul>
+        <li>Create &amp; manage events</li>
+        <li>Monitor ticket sales in real-time</li>
+        <li>Enforce capacity limits</li>
+      </ul>
+    </div>
+  </div>
+  <div style="margin-top: 1.2rem;">
+    <h3>Venue Staff</h3>
+    <ul>
+      <li>Scan and validate QR tickets at entry — no manual list-checking</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════════════════════
+     DIVIDER — SOLUTION
+══════════════════════════ -->
+<section class="divider-slide">
+  <div class="section-num">02</div>
+  <h1>Solution &amp; Architecture</h1>
+</section>
+
+<!-- ══════════════════════════
+     5. SOLUTION OVERVIEW
+══════════════════════════ -->
+<section>
+  <div class="slide-footer">Bookit · Group 48</div>
+  <h2>Solution Overview</h2>
+  <div class="demo-media-layout" style="align-items:start;">
+    <div>
+      <p>A responsive web application covering the complete ticket lifecycle — from creation to validated entry.</p>
+      <div class="tag-row" style="margin: 0.8rem 0;">
+        <span class="tag">React 19 + Vite</span>
+        <span class="tag">Tailwind CSS</span>
+        <span class="tag">Supabase BaaS</span>
+        <span class="tag">PostgreSQL + RLS</span>
+        <span class="tag">qrcode.react</span>
+        <span class="tag">html5-qrcode</span>
+        <span class="tag">Vercel</span>
+      </div>
+      <ul>
+        <li>Three user roles: Attendee, Organizer, Venue Staff</li>
+        <li>Row Level Security enforces data isolation at the database layer</li>
+        <li>Deployed to production on Vercel — auto-deploy from GitHub</li>
+      </ul>
+    </div>
+    <div class="demo-media-img">
+      <img src="flexibility-preview.gif" alt="Responsive layout preview" style="max-width:100%; max-height:320px; border-radius:4px; border:1px solid var(--rule);"/>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════
+     6. ARCHITECTURE
+══════════════════════════ -->
+<section>
+  <div class="slide-footer">Bookit · Group 48</div>
+  <h2>Architecture</h2>
+  <div class="demo-media-layout" style="align-items:start; gap:2.5rem;">
+    <div>
+      <div class="arch-layer pres">
+        <span class="layer-label">Presentation</span>
+        <span class="layer-content">React + Vite · Tailwind CSS · React Router v6 &nbsp;·&nbsp; <em>hosted on Vercel</em></span>
+      </div>
+      <div class="arch-layer app">
+        <span class="layer-label">Application</span>
+        <span class="layer-content">Supabase Auth · Events &amp; Orders · QR Validation · Organizer Dashboard · Realtime</span>
+      </div>
+      <div class="arch-layer data">
+        <span class="layer-label">Data</span>
+        <span class="layer-content">PostgreSQL · 5 tables · <code>handle_new_user</code> trigger · RLS on all tables</span>
+      </div>
+      <p style="margin-top: 0.8rem; font-size: 0.78rem; color: var(--light); font-style: italic;">
+        Supabase BaaS eliminates a custom API server — auth, DB, and real-time out of the box.
+      </p>
+    </div>
+    <div class="demo-media-img">
+      <div class="img-carousel">
+        <div class="img-carousel-track" id="arch-carousel">
+          <img src="progress-reports/architecture-final.png" alt="System architecture diagram"/>
+          <img src="progress-reports/database-architecture-final.png" alt="Database entity relationship diagram"/>
+        </div>
+        <div class="img-carousel-controls">
+          <button onclick="carouselPrev('arch-carousel')" aria-label="Previous">&#8592;</button>
+          <span class="img-carousel-dots">
+            <span class="dot active" id="arch-carousel-dot-0"></span>
+            <span class="dot" id="arch-carousel-dot-1"></span>
+          </span>
+          <button onclick="carouselNext('arch-carousel')" aria-label="Next">&#8594;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════
+     DIVIDER — DEMO
+══════════════════════════ -->
+<section class="divider-slide">
+  <div class="section-num">03</div>
+  <h1>Live Demo</h1>
+</section>
+
+<!-- ══════════════════════════
+     7a. DEMO — ATTENDEE
+══════════════════════════ -->
+<section>
+  <div class="slide-footer">Bookit · Group 48</div>
+  <h2>Demo — Attendee Flow</h2>
+  <div class="demo-media-layout">
+    <div class="demo-media-text">
+      <div class="demo-box">
+        <div class="flow">1 · Attendee flow</div>
+        <p>Register → Browse events → Add to cart → Checkout (mock payment) → My Tickets with QR code</p>
+      </div>
+      <div class="demo-box">
+        <div class="flow">2 · Organizer flow</div>
+        <p>Create event + ticket types → Publish → View live dashboard</p>
+      </div>
+    </div>
+    <div class="demo-media-img">
+      <div class="img-carousel">
+        <div class="img-carousel-track" id="attendee-carousel">
+          <img src="user-registration.gif" alt="User registration flow" class="active"/>
+          <img src="my-tickets.gif" alt="My Tickets with QR codes"/>
+        </div>
+        <div class="img-carousel-controls">
+          <button onclick="carouselPrev('attendee-carousel')" aria-label="Previous">&#8592;</button>
+          <span class="img-carousel-dots">
+            <span class="dot active" id="attendee-carousel-dot-0"></span>
+            <span class="dot" id="attendee-carousel-dot-1"></span>
+          </span>
+          <button onclick="carouselNext('attendee-carousel')" aria-label="Next">&#8594;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════
+     7b. DEMO — ORGANIZER
+══════════════════════════ -->
+<section>
+  <div class="slide-footer">Bookit · Group 48</div>
+  <h2>Demo — Organizer Flow</h2>
+  <div class="demo-media-layout">
+    <div class="demo-media-text">
+      <div class="demo-box">
+        <div class="flow">2 · Organizer flow</div>
+        <p>Create host account → Create event + ticket types → Publish → View live dashboard (revenue, tickets sold, capacity)</p>
+      </div>
+    </div>
+    <div class="demo-media-img">
+      <img src="create-host-account-and-event.gif" alt="Create host account and event" style="max-width:100%; max-height:340px; border-radius:4px; border:1px solid var(--rule);"/>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════
+     7c. DEMO — CHECKOUT + SCAN
+══════════════════════════ -->
+<section>
+  <div class="slide-footer">Bookit · Group 48</div>
+  <h2>Demo — Checkout &amp; QR Validation</h2>
+  <div class="demo-media-layout">
+    <div class="demo-media-text">
+      <div class="demo-box">
+        <div class="flow">3 · Checkout</div>
+        <p>Browse events → Add to cart → Mock payment → My Tickets with QR code</p>
+      </div>
+      <div class="demo-box">
+        <div class="flow">4 · Staff QR validation</div>
+        <p>Scan QR at <code>/staff/scan</code> → Ticket validated → Status marked <code>used</code> in database</p>
+      </div>
+    </div>
+    <div class="demo-media-img" style="display:flex; flex-direction:column; gap:0.5rem;">
+      <img src="events-and-checkout.gif" alt="Events and checkout flow" style="max-width:100%; max-height:200px; border-radius:4px; border:1px solid var(--rule); object-fit:cover;"/>
+      <img src="online-scanner.png" alt="QR scanner interface" style="max-width:100%; max-height:130px; border-radius:4px; border:1px solid var(--rule); object-fit:cover;"/>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════
+     8. TECHNICAL HIGHLIGHTS
+══════════════════════════ -->
+<section>
+  <div class="slide-footer">Bookit · Group 48</div>
+  <h2>Technical Highlights</h2>
+  <div class="two-col">
+    <div class="col-block">
+      <h3>RLS as Auth Layer</h3>
+      <ul>
+        <li>Access control enforced at the DB — not just the frontend</li>
+        <li>All 5 tables have RLS enabled</li>
+        <li>Role-based policies per table</li>
+      </ul>
+      <h3 style="margin-top:1rem;">QR Pipeline</h3>
+      <ul>
+        <li><code>crypto.randomUUID()</code> assigned at checkout</li>
+        <li><code>QRCodeSVG</code> renders ticket in-app</li>
+        <li><code>html5-qrcode</code> reads camera feed</li>
+        <li>Validation marks ticket <code>used</code> atomically — race condition safe</li>
+      </ul>
+    </div>
+    <div class="col-block">
+      <h3>Integration Challenges</h3>
+      <ul>
+        <li><strong>Role assignment bug</strong> — Supabase Auth defaulting all users to Attendee; fixed by correcting the <code>handle_new_user</code> trigger</li>
+        <li><strong>Dependency conflict</strong> — <code>html5-qrcode</code> incompatible with React 19; resolved via <code>legacy-peer-deps</code> in <code>.npmrc</code></li>
+        <li><strong>QR URL format</strong> — scanner rejecting full URL-encoded strings; fixed in <code>ticketValidation.js</code></li>
+        <li><strong>Capacity enforcement</strong> — overselling possible before atomic check was added at checkout</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════
+     DIVIDER — CONCLUSION
+══════════════════════════ -->
+<section class="divider-slide">
+  <div class="section-num">04</div>
+  <h1>Conclusion</h1>
+</section>
+
+<!-- ══════════════════════════
+     9. RESULTS
+══════════════════════════ -->
+<section>
+  <div class="slide-footer">Bookit · Group 48</div>
+  <h2>Results</h2>
+  <div class="stat-row">
+    <div class="stat"><span class="num">9/10</span><span class="lbl">Requirements met</span></div>
+    <div class="stat"><span class="num">20</span><span class="lbl">Test cases</span></div>
+    <div class="stat"><span class="num">4</span><span class="lbl">Defects found &amp; fixed</span></div>
+    <div class="stat"><span class="num">100%</span><span class="lbl">Pass rate after fixes</span></div>
+  </div>
+  <ul style="margin-top: 1rem;">
+    <li>Full ticket lifecycle from creation through QR-validated entry — live in production</li>
+    <li>One Must Have not completed: organizer attendee list export</li>
+    <li>One item descoped: email confirmation (replaced by in-app My Tickets page)</li>
+  </ul>
+</section>
+
+<!-- ══════════════════════════
+     10. LESSONS + FUTURE
+══════════════════════════ -->
+<section>
+  <div class="slide-footer">Bookit · Group 48</div>
+  <h2>Lessons Learned &amp; Future Work</h2>
+  <div class="two-col">
+    <div class="col-block">
+      <h3>Lessons Learned</h3>
+      <ul>
+        <li>BaaS reduces backend overhead significantly — but RLS complexity is non-trivial</li>
+        <li>Scope control matters — email descoping freed time for QR pipeline</li>
+        <li>Client-side UUID generation works but server-side signing would be more secure</li>
+      </ul>
+    </div>
+    <div class="col-block">
+      <h3>Future Work</h3>
+      <ul>
+        <li>Attendee list export for organizers</li>
+        <li>Server-side signed QR tokens</li>
+        <li>Email confirmation via Resend</li>
+        <li>Refund portal</li>
+        <li>Waitlist functionality</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════
+     11. CLOSING
+══════════════════════════ -->
+<section class="cover-slide">
+  <div class="eyebrow">COMP 2154 · Group 48</div>
+  <h1>Thank You</h1>
+  <div class="rule-line"></div>
+  <div class="meta">
+    Paul Yee <span style="color:var(--light);font-size:0.85em;">101489873</span> &nbsp;·&nbsp; Ben Morrison <span style="color:var(--light);font-size:0.85em;">101572409</span><br/><br/>
+    <em style="color: #aaa; font-size: 0.8rem;">Built with React · Supabase · Vercel</em><br/>
+    <a href="https://project-s0w2d.vercel.app/" style="font-size:0.75rem; color:#c8a96e; text-decoration:none; letter-spacing:0.03em; font-family:'DM Mono',monospace;">project-s0w2d.vercel.app</a>
+  </div>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
+<script>
+  const carouselState = {};
+  function carouselGo(id, idx) {
+    const track = document.getElementById(id);
+    const imgs = track.querySelectorAll('img');
+    const count = imgs.length;
+    idx = (idx + count) % count;
+    carouselState[id] = idx;
+    imgs.forEach((img, i) => img.classList.toggle('active', i === idx));
+    for (let i = 0; i < count; i++) {
+      const dot = document.getElementById(id + '-dot-' + i);
+      if (dot) dot.classList.toggle('active', i === idx);
+    }
+  }
+  function carouselNext(id) { carouselGo(id, (carouselState[id] || 0) + 1); }
+  function carouselPrev(id) { carouselGo(id, (carouselState[id] || 0) - 1); }
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.img-carousel-track').forEach(track => {
+      carouselGo(track.id, 0);
+    });
+  });
+
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    progress: true,
+    transition: 'fade',
+    transitionSpeed: 'slow',
+    backgroundTransition: 'fade',
+    center: false,
+    width: 1200,
+    height: 700,
+    margin: 0.06,
+  });
+</script>
+</body>
+</html>
